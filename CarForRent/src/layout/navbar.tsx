@@ -13,10 +13,10 @@ export default function Navbar(){
 	          <li className="nav-item"><a href="services" className="nav-link">Services</a></li>
 	          <li className="nav-item"><a href="pricing" className="nav-link">Pricing</a></li>
 	          <li className="nav-item"><a href="cars" className="nav-link">Cars</a></li>
-	          {/* <li className="nav-item"><a href="blog" className="nav-link">Blog</a></li> */}
+	          {/* <li className="nav-items"><a href="blog" className="nav-link">Blog</a></li> */}
 	          <li className="nav-item"><a href="contact" className="nav-link">Contact</a></li>
 	        </ul>
-	      </div>
+	      </div> 
 	    </div>
 	  </nav>)
 }
