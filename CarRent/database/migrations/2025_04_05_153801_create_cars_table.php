@@ -13,16 +13,22 @@ return new class extends Migration
     {
         Schema::create('cars', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // مالك السيارة (lessor)
-            $table->string('name'); // اسم السيارة أو موديلها
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->string('color');
             $table->text('description');
-            $table->string('location'); // مكان تواجد السيارة
+            $table->string('location');
             $table->decimal('price_per_day', 10, 2);
+            $table->decimal('price_per_month', 10, 2)->nullable();
+
             $table->enum('status', ['available', 'rented'])->default('available');
             $table->enum('car_type', ['Sedan', 'SUV', 'Truck', 'Van', 'Coupe', 'Convertible', 'Other'])->default('Sedan');
-            $table->integer('seats')->default(4); // عدد الركاب
-            $table->string('transmission')->default('Automatic'); // نوع ناقل الحركة
-            $table->string('fuel_type')->default('Petrol'); // نوع الوقود
+            $table->integer('seats')->default(4);
+            $table->string('transmission')->default('Automatic');
+            $table->string('fuel_type')->default('Petrol');
+            $table->decimal('add', 10, 2)->nullable()->default(null);
+
+
             $table->softDeletes();
             $table->timestamps();
         });

@@ -1,5 +1,4 @@
 <?php
-
 return [
 
     /*
@@ -17,18 +16,19 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['*'], // السماح بجميع الطرق
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['http://localhost:5173'], // السماح بعنوان الـ Frontend الخاص بك
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['*'], // السماح بكل رؤوس الطلبات
 
     'exposed_headers' => [],
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => false, // إذا كنت بحاجة لدعم ملفات تعريف الارتباط، قم بتغييرها إلى true
 
+    'hosts' => [],
 ];

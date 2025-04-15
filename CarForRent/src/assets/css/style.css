@@ -8516,7 +8516,13 @@ h1, h2, h3, h4, h5,
 .owl-carousel {
   position: relative; }
   .owl-carousel .owl-item {
-    opacity: .4; }
+    min-height: 400px; /* تجنب ارتفاع صفر */
+  }
+  .car-wrap {
+    height: 100%;
+  }
+  .owl-carousel .owl-item {
+    opacity: .4 ; }
     .owl-carousel .owl-item.active {
       opacity: 1; }
   .owl-carousel .owl-nav {
@@ -9948,4 +9954,197 @@ textarea.form-control {
     stroke-dashoffset: -136px; } }
 
 
+    .nav-link.active {
+      color: #01d28e !important;
+  }
+  .flatpickr-day.disabled {
+    text-decoration: line-through;
+    color: #ff0000;
+    background: #ffecec;
+  }
+  .booked-date {
+    background-color: #ffcccb !important;
+    color: #999 !important;
+    text-decoration: line-through;
+  }
+
+
+  .lessor-info {
+    transition: all 0.3s ease;
+  }
+  
+  .lessor-info:hover {
+    color: #007bff;
+    transform: translateX(5px);
+  }
+  
+  .card {
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  .car-slider::-webkit-scrollbar {
+    display: none;
+  }
+  .scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  
+  .scroll-btn.left {
+    left: 15px;
+  }
+  
+  .scroll-btn.right {
+    right: 15px;
+  }
+  
+  .scroll-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .car-slider-container {
+    position: relative;
+    padding: 0 40px;
+  }
+  
+  .car-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px;
+    padding: 20px 0;
+    scrollbar-width: none; /* لإخفاء شريط التمرير في Firefox */
+    -ms-overflow-style: none;
+  }
+  
+  .car-slider::-webkit-scrollbar {
+    display: none; /* لإخفاء شريط التمرير في Chrome و Safari */
+  }
+  .car-slide-item {
+    flex: 0 0 300px; /* عرض ثابت لكل عنصر */
+    scroll-snap-align: start;
+  }
+  
+  .slider-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 10;
+    transition: all 0.3s ease;
+  }
+  
+  .slider-nav-btn:hover {
+    background: #f8f9fa;
+  }
+  
+  .slider-prev {
+    left: 0;
+  }
+  
+  .slider-next {
+    right: 0;
+  }
+  .car-wrap {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+  }
+  .car-wrap:hover {
+    transform: translateY(-5px);
+  }
+
+  .car-wrap .text {
+    padding: 15px;
+  }
+
+  .car-wrap .price {
+    font-size: 1.2rem;
+    color: #007bff;
+  }
+  
+  .car-wrap .price span {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  .car-slide-item {
+    min-width: 300px;
+    flex: 0 0 auto;
+    margin-right: 15px;
+    transition: transform 0.3s ease;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .car-slide-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  @media (max-width: 768px) {
+    .slider-nav-btn {
+      width: 30px;
+      height: 30px;
+    }
     
+    .slider-prev {
+      left: -15px;
+    }
+    
+    .slider-next {
+      right: -15px;
+    }
+    
+    .car-slide-item {
+      min-width: 250px;
+    }}
+    .slick-slide {
+      padding: 0 10px;
+    }
+    
+    .slick-list {
+      margin: 0 -10px;
+    }
+    
+    .slick-prev:before, .slick-next:before {
+      color: #000;
+    }
+
+    .card {
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .btn-outline-danger:hover {
+      background-color: #dc3545;
+      color: white;
+    }

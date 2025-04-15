@@ -10,11 +10,12 @@ class Car extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id', 'title', 'description', 'location', 'price_per_day',
-        'status', 'type', 'guest_limit'
+        'user_id', 'name', 'color', 'description', 'location',
+        'price_per_day', 'price_per_month', 'status', 'car_type',
+        'seats', 'transmission', 'fuel_type', 'add'
     ];
 
-    public function lessor() {
+    public function Lessor() {
         return $this->belongsTo(User::class, 'user_id');
     }
 

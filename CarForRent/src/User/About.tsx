@@ -6,7 +6,7 @@ export default function About(){
       <div className="container">
         <div className="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
           <div className="col-md-9 ftco-animate pb-5">
-          	<p className="br/eadcrumbs"><span className="mr-2"><a href="index.html">Home <i className="ion-ios-arrow-forward"></i></a></span> <span>About us <i className="ion-ios-arrow-forward"></i></span></p>
+          	<p className="br/eadcrumbs"><span className="mr-2"><a href="/">Home <i className="ion-ios-arrow-forward"></i></a></span> <span>About us <i className="ion-ios-arrow-forward"></i></span></p>
             <h1 className="mb-3 br/ead">About Us</h1>
           </div>
         </div>
@@ -25,27 +25,27 @@ export default function About(){
 
 	            <p>A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p>
 	            <p>On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word "and" and the Little Blind Text should turn around and return to its own, safe country. A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p>
-	            <p><a href="#" className="btn btn-primary py-3 px-4">Search Vehicle</a></p>
+	            <p><a href="cars" className="btn btn-primary py-3 px-4">Search Vehicle</a></p>
 	          </div>
 					</div>
 				</div>
 			</div>
 		</section>
+    <section className="ftco-section ftco-intro" style={{ backgroundImage: "url(/images/bg_3.jpg)" }}>
+  <div className="overlay"></div>
+  <div className="container">
+    <div className="row justify-content-end">
+      <div className="col-md-6 heading-section heading-section-white ftco-animate">
+        <h2 className="mb-3">Do You Want to Earn by Renting Your Car?</h2>
+        <p className="mb-4">Join our platform and start earning by renting your car to trusted customers today.</p>
+        <a href="/register" className="btn btn-primary btn-lg">Become a Partner</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-		<section className="ftco-section ftco-intro" style={{backgroundImage: "url('images/bg_3.jpg')"}}>
-			<div className="overlay"></div>
-			<div className="container">
-				<div className="row justify-content-end">
-					<div className="col-md-6 heading-section heading-section-white ftco-animate">
-            <h2 className="mb-3">Do You Want To Earn With Us? So Don't Be Late.</h2>
-            <a href="#" className="btn btn-primary btn-lg">Become A Driver</a>
-          </div>
-				</div>
-			</div>
-		</section>
 
-
-    <section className="ftco-section testimony-section bg-light">
+    {/* <section className="ftco-section testimony-section bg-light">
       <div className="container">
         <div className="row justify-content-center mb-5">
           <div className="col-md-7 text-center heading-section ftco-animate">
@@ -115,7 +115,7 @@ export default function About(){
           </div>
         </div>
       </div>
-    </section>
+    </section> */}
 
     <section className="ftco-counter ftco-section img" id="section-counter">
 			<div className="overlay"></div>

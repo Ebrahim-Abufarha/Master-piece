@@ -1,356 +1,974 @@
-export default function CarSingle(){
-    return(
-        <>
-          <section className="hero-wrap hero-wrap-2 js-fullheight" style={{backgroundImage: "url('images/bg_3.jpg')"}} data-stellar-background-ratio="0.5">
-      <div className="overlay"></div>
-      <div className="container">
-        <div className="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
-          <div className="col-md-9 ftco-animate pb-5">
-          	<p className="breadcrumbs"><span className="mr-2"><a href="index.html">Home <i className="ion-ios-arrow-forward"></i></a></span> <span>Car details <i className="ion-ios-arrow-forward"></i></span></p>
-            <h1 className="mb-3 bread">Car Details</h1>
-          </div>
-        </div>
-      </div>
-    </section>
-		
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Modal, Button, Form } from 'react-bootstrap';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-		<section className="ftco-section ftco-car-details">
-      <div className="container">
-      	<div className="row justify-content-center">
-      		<div className="col-md-12">
-      			<div className="car-details">
-      				<div className="img rounded" style={{backgroundImage: "url(images/bg_1.jpg)"}}></div>
-      				<div className="text text-center">
-      					<span className="subheading">Cheverolet</span>
-      					<h2>Mercedes Grand Sedan</h2>
-      				</div>
-      			</div>
-      		</div>
-      	</div>
-      	<div className="row">
-      		<div className="col-md d-flex align-self-stretch ftco-animate">
-            <div className="media block-6 services">
-              <div className="media-body py-md-4">
-              	<div className="d-flex mb-3 align-items-center">
-	              	<div className="icon d-flex align-items-center justify-content-center"><span className="flaticon-dashboard"></span></div>
-	              	<div className="text">
-		                <h3 className="heading mb-0 pl-3">
-		                	Mileage
-		                	<span>40,000</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
-          </div>
-          <div className="col-md d-flex align-self-stretch ftco-animate">
-            <div className="media block-6 services">
-              <div className="media-body py-md-4">
-              	<div className="d-flex mb-3 align-items-center">
-	              	<div className="icon d-flex align-items-center justify-content-center"><span className="flaticon-pistons"></span></div>
-	              	<div className="text">
-		                <h3 className="heading mb-0 pl-3">
-		                	Transmission
-		                	<span>Manual</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
-          </div>
-          <div className="col-md d-flex align-self-stretch ftco-animate">
-            <div className="media block-6 services">
-              <div className="media-body py-md-4">
-              	<div className="d-flex mb-3 align-items-center">
-	              	<div className="icon d-flex align-items-center justify-content-center"><span className="flaticon-car-seat"></span></div>
-	              	<div className="text">
-		                <h3 className="heading mb-0 pl-3">
-		                	Seats
-		                	<span>5 Adults</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
-          </div>
-          <div className="col-md d-flex align-self-stretch ftco-animate">
-            <div className="media block-6 services">
-              <div className="media-body py-md-4">
-              	<div className="d-flex mb-3 align-items-center">
-	              	<div className="icon d-flex align-items-center justify-content-center"><span className="flaticon-backpack"></span></div>
-	              	<div className="text">
-		                <h3 className="heading mb-0 pl-3">
-		                	Luggage
-		                	<span>4 Bags</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
-          </div>
-          <div className="col-md d-flex align-self-stretch ftco-animate">
-            <div className="media block-6 services">
-              <div className="media-body py-md-4">
-              	<div className="d-flex mb-3 align-items-center">
-	              	<div className="icon d-flex align-items-center justify-content-center"><span className="flaticon-diesel"></span></div>
-	              	<div className="text">
-		                <h3 className="heading mb-0 pl-3">
-		                	Fuel
-		                	<span>Petrol</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
-          </div>
-      	</div>
-      	<div className="row">
-      		<div className="col-md-12 pills">
-						<div className="bd-example bd-example-tabs">
-							<div className="d-flex justify-content-center">
-							  <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
+interface CarImage {
+  id: number;
+  car_id: number;
+  image_path: string;
+  created_at: string;
+  updated_at: string;
+}
 
-							    <li className="nav-item">
-							      <a className="nav-link active" id="pills-description-tab" data-toggle="pill" href="#pills-description" role="tab" aria-controls="pills-description" aria-expanded="true">Features</a>
-							    </li>
-							    <li className="nav-item">
-							      <a className="nav-link" id="pills-manufacturer-tab" data-toggle="pill" href="#pills-manufacturer" role="tab" aria-controls="pills-manufacturer" aria-expanded="true">Description</a>
-							    </li>
-							    <li className="nav-item">
-							      <a className="nav-link" id="pills-review-tab" data-toggle="pill" href="#pills-review" role="tab" aria-controls="pills-review" aria-expanded="true">Review</a>
-							    </li>
-							  </ul>
-							</div>
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
 
-						  <div className="tab-content" id="pills-tabContent">
-						    <div className="tab-pane fade show active" id="pills-description" role="tabpanel" aria-labelledby="pills-description-tab">
-						    	<div className="row">
-						    		<div className="col-md-4">
-						    			<ul className="features">
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Airconditions</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Child Seat</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>GPS</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Luggage</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Music</li>
-						    			</ul>
-						    		</div>
-						    		<div className="col-md-4">
-						    			<ul className="features">
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Seat Belt</li>
-						    				<li className="remove"><span className="ion-ios-close"></span>Sleeping Bed</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Water</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Bluetooth</li>
-						    				<li className="remove"><span className="ion-ios-close"></span>Onboard computer</li>
-						    			</ul>
-						    		</div>
-						    		<div className="col-md-4">
-						    			<ul className="features">
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Audio input</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Long Term Trips</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Car Kit</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Remote central locking</li>
-						    				<li className="check"><span className="ion-ios-checkmark"></span>Climate control</li>
-						    			</ul>
-						    		</div>
-						    	</div>
-						    </div>
+interface Car {
+  id: number;
+  user_id: number;
+  name: string;
+  color: string;
+  description: string;
+  location: string;
+  price_per_day: number;
+  price_per_month: number | null;
+  status: 'available' | 'rented';
+  car_type: 'Sedan' | 'SUV' | 'Truck' | 'Van' | 'Coupe' | 'Convertible' | 'Other';
+  seats: number;
+  transmission: string;
+  fuel_type: string;
+  add: number | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  images?: CarImage[];
+  lessor?: User;
+}
 
-						    <div className="tab-pane fade" id="pills-manufacturer" role="tabpanel" aria-labelledby="pills-manufacturer-tab">
-						      <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.</p>
-									<p>When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek, then she continued her way.</p>
-						    </div>
+interface Booking {
+  id: number;
+  user_id: number;
+  car_id: number;
+  start_date: string;
+  end_date: string;
+  total_price: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
 
-						    <div className="tab-pane fade" id="pills-review" role="tabpanel" aria-labelledby="pills-review-tab">
-						      <div className="row">
-							   		<div className="col-md-7">
-							   			<h3 className="head">23 Reviews</h3>
-							   			<div className="review d-flex">
-									   		<div className="user-img" style={{backgroundImage: "url(images/person_1.jpg)"}}></div>
-									   		<div className="desc">
-									   			<h4>
-									   				<span className="text-left">Jacob Webb</span>
-									   				<span className="text-right">14 March 2018</span>
-									   			</h4>
-									   			<p className="star">
-									   				<span>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-								   					</span>
-								   					<span className="text-right"><a href="#" className="reply"><i className="icon-reply"></i></a></span>
-									   			</p>
-									   			<p>When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrov</p>
-									   		</div>
-									   	</div>
-									   	<div className="review d-flex">
-									   		<div className="user-img" style={{backgroundImage: "url(images/person_2.jpg)"}}></div>
-									   		<div className="desc">
-									   			<h4>
-									   				<span className="text-left">Jacob Webb</span>
-									   				<span className="text-right">14 March 2018</span>
-									   			</h4>
-									   			<p className="star">
-									   				<span>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-								   					</span>
-								   					<span className="text-right"><a href="#" className="reply"><i className="icon-reply"></i></a></span>
-									   			</p>
-									   			<p>When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrov</p>
-									   		</div>
-									   	</div>
-									   	<div className="review d-flex">
-									   		<div className="user-img" style={{backgroundImage: "url(images/person_3.jpg)"}}></div>
-									   		<div className="desc">
-									   			<h4>
-									   				<span className="text-left">Jacob Webb</span>
-									   				<span className="text-right">14 March 2018</span>
-									   			</h4>
-									   			<p className="star">
-									   				<span>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-								   					</span>
-								   					<span className="text-right"><a href="#" className="reply"><i className="icon-reply"></i></a></span>
-									   			</p>
-									   			<p>When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrov</p>
-									   		</div>
-									   	</div>
-							   		</div>
-							   		<div className="col-md-5">
-							   			<div className="rating-wrap">
-								   			<h3 className="head">Give a Review</h3>
-								   			<div className="wrap">
-									   			<p className="star">
-									   				<span>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					(98%)
-								   					</span>
-								   					<span>20 Reviews</span>
-									   			</p>
-									   			<p className="star">
-									   				<span>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					(85%)
-								   					</span>
-								   					<span>10 Reviews</span>
-									   			</p>
-									   			<p className="star">
-									   				<span>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					(70%)
-								   					</span>
-								   					<span>5 Reviews</span>
-									   			</p>
-									   			<p className="star">
-									   				<span>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					(10%)
-								   					</span>
-								   					<span>0 Reviews</span>
-									   			</p>
-									   			<p className="star">
-									   				<span>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					<i className="ion-ios-star"></i>
-									   					(0%)
-								   					</span>
-								   					<span>0 Reviews</span>
-									   			</p>
-									   		</div>
-								   		</div>
-							   		</div>
-							   	</div>
-						    </div>
-						  </div>
-						</div>
-		      </div>
-				</div>
-      </div>
-    </section>
+interface Review {
+  id: number;
+  user_id: number;
+  car_id: number;
+  rating: number;
+  comment: string;
+  created_at: string;
+  updated_at: string;
+  user?: User;
+}
 
-    <section className="ftco-section ftco-no-pt">
-    	<div className="container">
-    		<div className="row justify-content-center">
-          <div className="col-md-12 heading-section text-center ftco-animate mb-5">
-          	<span className="subheading">Choose Car</span>
-            <h2 className="mb-2">Related Cars</h2>
-          </div>
-        </div>
-        <div className="row">
-        	<div className="col-md-4">
-    				<div className="car-wrap rounded ftco-animate">
-    					<div className="img rounded d-flex align-items-end" style={{backgroundImage: "url(images/car-1.jpg)"}}>
-    					</div>
-    					<div className="text">
-    						<h2 className="mb-0"><a href="car-single.html">Mercedes Grand Sedan</a></h2>
-    						<div className="d-flex mb-3">
-	    						<span className="cat">Cheverolet</span>
-	    						<p className="price ml-auto">$500 <span>/day</span></p>
-    						</div>
-    						<p className="d-flex mb-0 d-block"><a href="#" className="btn btn-primary py-2 mr-1">Book now</a> <a href="car-single.html" className="btn btn-secondary py-2 ml-1">Details</a></p>
-    					</div>
-    				</div>
-    			</div>
-    			<div className="col-md-4">
-    				<div className="car-wrap rounded ftco-animate">
-    					<div className="img rounded d-flex align-items-end" style={{backgroundImage: "url(images/car-2.jpg)"}}>
-    					</div>
-    					<div className="text">
-    						<h2 className="mb-0"><a href="car-single.html">Range Rover</a></h2>
-    						<div className="d-flex mb-3">
-	    						<span className="cat">Subaru</span>
-	    						<p className="price ml-auto">$500 <span>/day</span></p>
-    						</div>
-    						<p className="d-flex mb-0 d-block"><a href="#" className="btn btn-primary py-2 mr-1">Book now</a> <a href="car-single.html" className="btn btn-secondary py-2 ml-1">Details</a></p>
-    					</div>
-    				</div>
-    			</div>
-    			<div className="col-md-4">
-    				<div className="car-wrap rounded ftco-animate">
-    					<div className="img rounded d-flex align-items-end" style={{backgroundImage: "url(images/car-3.jpg)"}}>
-    					</div>
-    					<div className="text">
-    						<h2 className="mb-0"><a href="car-single.html">Mercedes Grand Sedan</a></h2>
-    						<div className="d-flex mb-3">
-	    						<span className="cat">Cheverolet</span>
-	    						<p className="price ml-auto">$500 <span>/day</span></p>
-    						</div>
-    						<p className="d-flex mb-0 d-block"><a href="#" className="btn btn-primary py-2 mr-1">Book now</a> <a href="car-single.html" className="btn btn-secondary py-2 ml-1">Details</a></p>
-    					</div>
-    				</div>
-    			</div>
-        </div>
-    	</div>
-    </section>
+interface PaymentInfo {
+  cardNumber: string;
+  cardHolder: string;
+  expiryDate: string;
+  cvv: string;
+}
+
+const getImage = (car: Car & { images?: { image_path: string }[] }) => {
+  return car.images && car.images.length > 0
+    ? `http://localhost:8000/storage/${car.images[0].image_path}`
+    : '/images/default-car.jpg';
+};
+
+export default function CarSingle() {
+  const [showModal, setShowModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [car, setCar] = useState<Car | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [relatedCars, setRelatedCars] = useState<Car[]>([]);
+  const [disabledDates, setDisabledDates] = useState<Date[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [rating, setRating] = useState(0);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
+    cardNumber: '',
+    cardHolder: '',
+    expiryDate: '',
+    cvv: ''
+  });
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { id } = useParams<{ id: string }>();
+
+  const handleStartDateChange = (date: Date | null) => {
+    setStartDate(date);
+    setEndDate(null);
+  };
+
+  const isDateBooked = (date: Date): boolean => {
+    try {
+      if (!date) return false;
+      const checkDate = new Date(date);
+      checkDate.setHours(0, 0, 0, 0);
+      
+      return bookings.some(booking => {
+        const bookingStart = new Date(booking.start_date);
+        const bookingEnd = new Date(booking.end_date);
+        bookingStart.setHours(0, 0, 0, 0);
+        bookingEnd.setHours(0, 0, 0, 0);
+        return checkDate >= bookingStart && checkDate <= bookingEnd;
+      });
+    } catch (error) {
+      console.error("Error in isDateBooked:", error);
+      return false;
+    }
+  };
+  
+  const isEndDateDisabled = (date: Date): boolean => {
+    if (!startDate) return true;
+    if (date < startDate) return true;
     
-        </>
-    )
+    const tempDate = new Date(startDate);
+    tempDate.setDate(tempDate.getDate() + 1);
+    
+    while (tempDate <= date) {
+      if (isDateBooked(new Date(tempDate))) {
+        return true;
+      }
+      tempDate.setDate(tempDate.getDate() + 1);
+    }
+    
+    return false;
+  };
+
+  const handlePaymentInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPaymentInfo(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleProceedToPayment = () => {
+    if (!startDate || !endDate || !car) {
+      alert("Please select a start and end date.");
+      return;
+    }
+    
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      alert("You must be logged in to book a car.");
+      return;
+    }
+    
+    setShowModal(false);
+    setShowPaymentModal(true);
+  };
+
+  const handleProcessPayment = async () => {
+    if (!startDate || !endDate || !car) {
+      alert("Please select a start and end date.");
+      return;
+    }
+  
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      alert("You must be logged in to book a car.");
+      return;
+    }
+  
+    // Validate payment information
+    if (!paymentInfo.cardNumber || !paymentInfo.cardHolder || !paymentInfo.expiryDate || !paymentInfo.cvv) {
+      alert("Please fill in all payment details.");
+      return;
+    }
+  
+    // Basic card number validation (should be 16 digits)
+    if (!/^\d{16}$/.test(paymentInfo.cardNumber.replace(/\s/g, ''))) {
+      alert("Please enter a valid 16-digit card number.");
+      return;
+    }
+  
+    // Basic CVV validation (should be 3 or 4 digits)
+    if (!/^\d{3,4}$/.test(paymentInfo.cvv)) {
+      alert("Please enter a valid CVV (3 or 4 digits).");
+      return;
+    }
+  
+    setPaymentProcessing(true);
+  
+    const userIdNumber = parseInt(userId, 10);
+    if (isNaN(userIdNumber)) {
+      alert("Invalid user ID. Please login again.");
+      setPaymentProcessing(false);
+      return;
+    }
+  
+    const days = Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24));
+    const totalPrice = days * (car.price_per_day || 0);
+  
+    try {
+      // First process the payment (this would connect to your payment API)
+      // For this example, we'll simulate a payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Then create the booking
+      await axios.post('http://localhost:8000/api/bookings', {
+        user_id: userIdNumber,
+        car_id: car.id,
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
+        total: totalPrice,
+        status: 'confirmed',
+        payment_method: 'card'
+      });
+  
+      alert("Payment successful! Your booking has been confirmed.");
+      setShowPaymentModal(false);
+      setPaymentProcessing(false);
+      
+      // Reset payment form
+      setPaymentInfo({
+        cardNumber: '',
+        cardHolder: '',
+        expiryDate: '',
+        cvv: ''
+      });
+      
+      // Reset date selection
+      setStartDate(null);
+      setEndDate(null);
+      
+      if (car) {
+        fetchBookings(car.id);
+      }
+    } catch (error: unknown) {
+      setPaymentProcessing(false);
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data?.message || "There was an error processing your payment.");
+      } else if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("An unknown error occurred during payment processing");
+      }
+    }
+  };
+
+  const fetchBookings = async (carId: number) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/bookings/car-single/${carId}`);
+      const bookingsData = Array.isArray(response.data?.bookedDates) 
+        ? response.data.bookedDates 
+        : [];
+
+      setBookings(bookingsData);
+
+      const disabledDatesArray: Date[] = [];
+      bookingsData.forEach((booking: Booking) => {
+        const start = new Date(booking.start_date);
+        const end = new Date(booking.end_date);
+        
+        const currentDate = new Date(start);
+        while (currentDate <= end) {
+          disabledDatesArray.push(new Date(currentDate));
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      });
+
+      setDisabledDates(disabledDatesArray);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      setBookings([]);
+      setDisabledDates([]);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/reviews/${id}`);
+      setReviews(response.data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment || rating === 0) {
+      alert('Please add both a comment and a rating');
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('user_id');
+      if (!token || !userId) {
+        alert('You must be logged in to comment');
+        return;
+      }
+  
+      const response = await axios.post(
+        'http://localhost:8000/api/reviews',
+        {
+          car_id: id,
+          user_id: userId,
+          rating,
+          comment: newComment
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+  
+      setReviews([response.data, ...reviews]);
+      setNewComment('');
+      setRating(0);
+      setShowCommentForm(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        alert(error.response.data.message);
+      } else {
+        alert('An error occurred while adding the comment');
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get<Car>(`http://localhost:8000/api/cars/${id}?with_lessor=true`);
+        setCar(response.data);
+        await fetchBookings(response.data.id);
+        await fetchReviews();
+        
+        const allCarsResponse = await axios.get<Car[]>('http://localhost:8000/api/add');
+        const filtered = allCarsResponse.data.filter(c => c.id !== parseInt(id || '0'));
+        setRelatedCars(filtered);
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching car details:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  const highlightWithRed = (date: Date): string => {
+    return isDateBooked(date) ? "booked-date" : "";
+  };
+
+  if (loading) {
+    return (
+      <div className="container text-center py-5">
+        <h2>Loading car details...</h2>
+      </div>
+    );
+  }
+
+  if (!car) {
+    return (
+      <div className="container text-center py-5">
+        <h2>Car not found</h2>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <style>
+        {`
+          .booked-date {
+            background-color: #ffcccb !important;
+            border-radius: 0;
+            color: #999 !important;
+            text-decoration: line-through;
+          }
+          .react-datepicker__day--disabled {
+            color: #ccc !important;
+            text-decoration: line-through;
+          }
+          .star-rating {
+            font-size: 1.5rem;
+            cursor: pointer;
+          }
+          .star-rating .star {
+            color: #e4e5e9;
+          }
+          .star-rating .star.active {
+            color: #ffc107;
+          }
+          .payment-form .form-group {
+            margin-bottom: 20px;
+          }
+          .payment-form label {
+            font-weight: 600;
+          }
+          .card-element {
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+          }
+          .payment-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+          }
+          .payment-header {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+          }
+          .payment-summary {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+          }
+        `}
+      </style>
+      
+      <section className="hero-wrap hero-wrap-2 js-fullheight" style={{ backgroundImage: "url('/images/bg_3.jpg')" }} data-stellar-background-ratio="0.5">
+        <div className="overlay"></div>
+        <div className="container">
+          <div className="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
+            <div className="col-md-9 ftco-animate pb-5">
+              <p className="breadcrumbs"><span className="mr-2"><a href="/">Home <i className="ion-ios-arrow-forward"></i></a></span> <span>Car details <i className="ion-ios-arrow-forward"></i></span></p>
+              <h1 className="mb-3 bread">Car Details</h1>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section className="ftco-section ftco-car-details">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-12">
+              <div className="car-details">
+                <div className="car-images position-relative d-flex align-items-center justify-content-center mb-3" style={{ gap: '1rem' }}>
+                  {car.images && car.images.length > 0 ? (
+                    <>
+                      <button
+                        className="btn btn-dark position-absolute"
+                        style={{ left: '10px', zIndex: 10 }}
+                        onClick={() => setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? (car.images?.length || 1) - 1 : prevIndex - 1))}
+                      >
+                        &lt;
+                      </button>
+                      <div
+  className="img rounded"
+  style={{
+    width: '100%',
+    height: '400px',
+    backgroundImage: `url(http://localhost:8000/storage/${car.images[currentImageIndex].image_path})`,
+    backgroundSize: 'contain', // تعديل هنا
+    backgroundRepeat: 'no-repeat', // منع تكرار الصورة
+    backgroundPosition: 'center', // تمركز الصورة
+  }}
+></div>
+                      <button
+                        className="btn btn-dark position-absolute"
+                        style={{ right: '10px', zIndex: 10 }}
+                        onClick={() => setCurrentImageIndex((prevIndex) => (car.images && prevIndex === car.images.length - 1 ? 0 : (prevIndex + 1) % (car.images?.length || 1)))}
+                      >
+                        &gt;
+                      </button>
+                    </>
+                  ) : (
+                    <div
+                      className="img rounded"
+                      style={{
+                        width: '100%',
+                        height: '400px',
+                        backgroundImage: `url(/images/default-car.jpg)`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                      }}
+                    ></div>
+                  )}
+                </div>
+                <div className="text text-center">
+                  <span className="subheading">{car.car_type}</span>
+                  <h2>{car.name}</h2>
+                  {car.lessor && (
+                    <div className="lessor-info mb-3">
+                      <p className="mb-0">Rented by: <strong>{car.lessor.name}</strong></p>
+                    </div>
+                  )}
+                  <p className="price">
+                    <span>${car.price_per_day}</span> / day
+                    <a onClick={() => setShowModal(true)} className="btn btn-primary py-2 mr-1" role="button">Book Now</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="row">
+  <div className="col-md d-flex align-self-stretch ftco-animate">
+    <div className="media block-6 services">
+      <div className="media-body py-md-4">
+        <div className="d-flex mb-3 align-items-center">
+          <div className="icon d-flex align-items-center justify-content-center">
+            <i className="fas fa-palette"></i>
+          </div>
+          <div className="text">
+            <h3 className="heading mb-0 pl-3">
+              Color
+              <span> {car.color}</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="col-md d-flex align-self-stretch ftco-animate">
+    <div className="media block-6 services">
+      <div className="media-body py-md-4">
+        <div className="d-flex mb-3 align-items-center">
+          <div className="icon d-flex align-items-center justify-content-center">
+            <i className="fas fa-cogs"></i>
+          </div>
+          <div className="text">
+            <h3 className="heading mb-0 pl-3">
+              Transmission
+              <span> {car.transmission}</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="col-md d-flex align-self-stretch ftco-animate">
+    <div className="media block-6 services">
+      <div className="media-body py-md-4">
+        <div className="d-flex mb-3 align-items-center">
+          <div className="icon d-flex align-items-center justify-content-center">
+            <i className="fas fa-chair"></i>
+          </div>
+          <div className="text">
+            <h3 className="heading mb-0 pl-3">
+              Seats
+              <span> {car.seats} Adults</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="col-md d-flex align-self-stretch ftco-animate">
+    <div className="media block-6 services">
+      <div className="media-body py-md-4">
+        <div className="d-flex mb-3 align-items-center">
+          <div className="icon d-flex align-items-center justify-content-center">
+            <i className="fas fa-circle"></i>
+          </div>
+          <div className="text">
+            <h3 className="heading mb-0 pl-3">
+              Status
+              <span> {car.status}</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="col-md d-flex align-self-stretch ftco-animate">
+    <div className="media block-6 services">
+      <div className="media-body py-md-4">
+        <div className="d-flex mb-3 align-items-center">
+          <div className="icon d-flex align-items-center justify-content-center">
+            <i className="fas fa-gas-pump"></i>
+          </div>
+          <div className="text">
+            <h3 className="heading mb-0 pl-3">
+              Fuel
+              <span> {car.fuel_type}</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+          
+          <div className="row">
+            <div className="col-md-12 pills">
+              <div className="bd-example bd-example-tabs">
+                <div className="d-flex justify-content-center">
+                  <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li className="nav-item">
+                      <a className="nav-link active" id="pills-description-tab" data-toggle="pill" href="#pills-description" role="tab" aria-controls="pills-description" aria-expanded="true">Comments</a>
+                    </li>
+                    <li className="nav-item">
+                      <a className="nav-link" id="pills-manufacturer-tab" data-toggle="pill" href="#pills-manufacturer" role="tab" aria-controls="pills-manufacturer" aria-expanded="true">Description</a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="tab-content" id="pills-tabContent">
+                  <div className="tab-pane fade show active" id="pills-description" role="tabpanel" aria-labelledby="pills-description-tab">
+                    <div className="row">
+                      <div className="col-md-12">
+                        <h4>Customer Reviews</h4>
+                        
+                        {reviews.length === 0 ? (
+                          <p>No reviews yet</p>
+                        ) : (
+                          reviews.map(review => (
+                            <div key={review.id} className="card mb-3">
+                              <div className="card-body">
+                                <div className="d-flex justify-content-between">
+                                  <h5 className="card-title">{review.user?.name || 'Anonymous'}</h5>
+                                  <div>
+                                    {[...Array(5)].map((_, i) => (
+                                      <span key={i} style={{ color: i < review.rating ? '#ffc107' : '#e4e5e9' }}>
+                                        ★
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <p className="card-text">{review.comment}</p>
+                                <small className="text-muted">
+                                  {new Date(review.created_at).toLocaleDateString()}
+                                </small>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                        
+                        {localStorage.getItem('token') && !showCommentForm && (
+                          <button 
+                            onClick={() => setShowCommentForm(true)}
+                            className="btn btn-primary mt-3"
+                          >
+                            Add Review
+                          </button>
+                        )}
+                        
+                        {showCommentForm && (
+                          <div className="card mt-3">
+                            <div className="card-body">
+                              <h5 className="card-title">Write a Review</h5>
+                              <div className="form-group">
+                                <label>Rating</label>
+                                <div>
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <span
+                                      key={star}
+                                      style={{ 
+                                        cursor: 'pointer',
+                                        fontSize: '1.5rem',
+                                        color: star <= rating ? '#ffc107' : '#e4e5e9'
+                                      }}
+                                      onClick={() => setRating(star)}
+                                    >
+                                      ★
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="form-group">
+                                <label>Your Review</label>
+                                <textarea
+                                  className="form-control"
+                                  rows={3}
+                                  value={newComment}
+                                  onChange={(e) => setNewComment(e.target.value)}
+                                />
+                              </div>
+                              <button 
+                                onClick={handleAddComment}
+                                className="btn btn-primary mr-2"
+                              >
+                                Submit
+                              </button>
+                              <button 
+                                onClick={() => setShowCommentForm(false)}
+                                className="btn btn-secondary"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="tab-pane fade" id="pills-manufacturer" role="tabpanel" aria-labelledby="pills-manufacturer-tab">
+                    <p>{car.description}</p>
+                    <p>Location: {car.location}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="ftco-section ftco-no-pt">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-md-12 heading-section text-center ftco-animate mb-5">
+              <span className="subheading">Choose Car</span>
+              <h2 className="mb-2">Related Cars</h2>
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-12">
+              <Slider
+                dots={true}
+                infinite={true}
+                speed={500}
+                slidesToShow={4}
+                slidesToScroll={4}
+                responsive={[
+                  {
+                    breakpoint: 1024,
+                    settings: {
+                      slidesToShow: 3,
+                      slidesToScroll: 3,
+                    },
+                  },
+                  {
+                    breakpoint: 768,
+                    settings: {
+                      slidesToShow: 2,
+                      slidesToScroll: 2,
+                    },
+                  },
+                  {
+                    breakpoint: 576,
+                    settings: {
+                      slidesToShow: 1,
+                      slidesToScroll: 1,
+                    },
+                  },
+                ]}
+              >
+                {relatedCars.map((relatedCar) => (
+                  <div className="px-2" key={relatedCar.id}>
+                    <div className="car-wrap rounded ftco-animate">
+                      <div
+                        className="img rounded d-flex align-items-end"
+                        style={{
+                          backgroundImage: `url(${getImage(relatedCar)})`,
+                          height: "200px",
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      ></div>
+                      <div className="text p-3">
+                        <h2 className="mb-0">
+                          <a href={`/cars/${relatedCar.id}`} className="text-dark">
+                            {relatedCar.name}
+                          </a>
+                        </h2>
+                        <div className="d-flex mb-3">
+                          <span className="cat text-muted">{relatedCar.car_type}</span>
+                          <p className="price ml-auto mb-0">
+                            ${relatedCar.price_per_day} <span>/day</span>
+                          </p>
+                        </div>
+                        <div className="d-flex">
+                          <a href={`car-single/${car.id}`} className="btn btn-secondary py-2 ml-1">Details</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </Slider>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Booking Modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Book This Car</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="form-group mb-3">
+            <label>Start Date</label>
+            <DatePicker 
+              selected={startDate} 
+              onChange={handleStartDateChange}
+              className="form-control"
+              minDate={new Date()}
+              dayClassName={highlightWithRed}
+              filterDate={(date) => !isDateBooked(date)}
+              placeholderText="Select start date"
+              dateFormat="yyyy-MM-dd"
+              isClearable
+              required
+              excludeDates={disabledDates}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>End Date</label>
+            <DatePicker 
+              selected={endDate} 
+              onChange={(date: Date | null) => setEndDate(date)}
+              className="form-control"
+              minDate={startDate ? new Date(startDate.getTime() + 86400000) : new Date()}
+              filterDate={(date) => !isEndDateDisabled(date)}
+              placeholderText="Select end date"
+              dateFormat="yyyy-MM-dd"
+              isClearable
+              disabled={!startDate}
+              required
+              dayClassName={highlightWithRed}
+            />
+          </div>
+          
+          {startDate && endDate && (
+            <div className="mt-3 p-3 bg-light rounded">
+              <p className="mb-1"><strong>Booking Summary:</strong></p>
+              <p className="mb-1">Start Date: {startDate.toISOString().split('T')[0]}</p>
+              <p className="mb-1">End Date: {endDate.toISOString().split('T')[0]}</p>
+              <p className="mb-1">
+                Duration: {Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24))} days
+              </p>
+              <p className="mb-0 font-weight-bold">
+                Total Price: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day}
+              </p>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleProceedToPayment} 
+            disabled={!startDate || !endDate}
+          >
+            Proceed to Payment
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Payment Modal */}
+      <Modal show={showPaymentModal} onHide={() => setShowPaymentModal(false)} backdrop="static">
+        <Modal.Header closeButton>
+          <Modal.Title>Payment Information</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="payment-card">
+            <div className="payment-header">
+              <h5>Car Rental Payment</h5>
+            </div>
+            
+            <Form className="payment-form">
+              <Form.Group>
+                <Form.Label>Card Number</Form.Label>
+                <Form.Control 
+                  type="text" 
+                  name="cardNumber"
+                  value={paymentInfo.cardNumber}
+                  onChange={handlePaymentInfoChange}
+                  placeholder="1234 5678 9012 3456"
+                  maxLength={19}
+                  required
+                />
+              </Form.Group>
+              
+              <Form.Group>
+                <Form.Label>Card Holder Name</Form.Label>
+                <Form.Control 
+                  type="text" 
+                  name="cardHolder"
+                  value={paymentInfo.cardHolder}
+                  onChange={handlePaymentInfoChange}
+                  placeholder="John Doe"
+                  required
+                />
+              </Form.Group>
+              
+              <div className="row">
+                <div className="col-md-6">
+                  <Form.Group>
+                    <Form.Label>Expiry Date</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="expiryDate"
+                      value={paymentInfo.expiryDate}
+                      onChange={handlePaymentInfoChange}
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      required
+                    />
+                  </Form.Group>
+                </div>
+                <div className="col-md-6">
+                  <Form.Group>
+                    <Form.Label>CVV</Form.Label>
+                    <Form.Control 
+                      type="password" 
+                      name="cvv"
+                      value={paymentInfo.cvv}
+                      onChange={handlePaymentInfoChange}
+                      placeholder="123"
+                      maxLength={4}
+                      required
+                    />
+                  </Form.Group>
+                </div>
+              </div>
+            </Form>
+            
+            {startDate && endDate && car && (
+              <div className="payment-summary">
+                <h6 className="mb-3">Payment Summary</h6>
+                <p className="mb-1">Vehicle: {car.name}</p>
+                <p className="mb-1">Duration: {Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24))} days</p>
+                <p className="mb-1">Start Date: {startDate.toISOString().split('T')[0]}</p>
+                <p className="mb-1">End Date: {endDate.toISOString().split('T')[0]}</p>
+                <hr />
+                <p className="mb-0 font-weight-bold">
+                  Total Amount: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day}
+                </p>
+              </div>
+            )}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowPaymentModal(false)}>
+            Cancel
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleProcessPayment}
+            disabled={!paymentInfo.cardNumber || !paymentInfo.cardHolder || !paymentInfo.expiryDate || !paymentInfo.cvv || paymentProcessing}
+          >
+            {paymentProcessing ? (
+              <>
+                <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+                Processing...
+              </>
+            ) : (
+              'Complete Payment'
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
 }
