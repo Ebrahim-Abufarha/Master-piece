@@ -65,13 +65,12 @@ Route::post('/{id}', [UserController::class, 'update']);
 
 });
 
-    // Routes للسيارات المفضلة
     Route::get('/favorites/{id}', [FavoriteController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'store']);
     Route::delete('/favorites/{carId}/{id}', [FavoriteController::class, 'destroy']);
 
 
-    Route::post('/reviews', [ReviewController::class, 'store']); // إضافة تعليق
+    Route::post('/reviews', [ReviewController::class, 'store']); 
     Route::get('/reviews/{car_id}', [ReviewController::class, 'index']);
 
 

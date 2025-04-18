@@ -31,7 +31,6 @@ class LessorBookingController extends Controller
     }
 
 
-    // جلب التواريخ المحجوزة لسيارة معينة
     public function getBookedDates($carId)
     {
         $bookedDates = Booking::where('car_id', $carId)
@@ -47,7 +46,6 @@ class LessorBookingController extends Controller
         return response()->json(['bookedDates' => $bookedDates]);
     }
 
-    // إنشاء حجز جديد
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -64,12 +62,10 @@ class LessorBookingController extends Controller
         return response()->json(['message' => 'Booking created successfully', 'data' => $booking], 201);
     }
 
-    // تعديل حجز موجود (خاص بالمؤجر فقط)
     public function update(Request $request, $id, $lessorId)
     {
         $booking = Booking::findOrFail($id);
 
-        // التأكد أن الحجز يخص سيارة يملكها المؤجر
         if ($booking->car->user_id != $lessorId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -86,12 +82,10 @@ class LessorBookingController extends Controller
         return response()->json(['message' => 'Booking updated successfully', 'data' => $booking]);
     }
 
-    // حذف حجز (خاص بالمؤجر فقط)
     public function destroy($id, $lessorId)
     {
         $booking = Booking::findOrFail($id);
 
-        // التأكد من أن المؤجر يملك السيارة المرتبطة بالحجز
         if ($booking->car->user_id != $lessorId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }

@@ -45,7 +45,6 @@ const EditCar: React.FC = () => {
           
           console.log("Full response:", response);
           
-          // تحقق من هيكل البيانات المستلمة
           if (response.data && response.data.data) {
             const carData = response.data.data;
             console.log("Car data:", carData);
@@ -87,9 +86,7 @@ const EditCar: React.FC = () => {
   const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
 
 const handleDeleteImage = (imageId: number) => {
-  // إضافة معرف الصورة إلى قائمة الصور المراد حذفها
   setImagesToDelete([...imagesToDelete, imageId]);
-  // إزالة الصورة من حالة الصور المعروضة
   setImages(images.filter(img => img.id !== imageId));
 };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +96,6 @@ const handleDeleteImage = (imageId: number) => {
     }
   };
 
-  // قم بتعديل دالة handleSubmit لتتبع الاستجابة والخطأ بشكل أفضل
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
@@ -115,12 +111,10 @@ const handleDeleteImage = (imageId: number) => {
     formData.append('price_per_day', carData.price_per_day);
     formData.append('_method', 'PUT');
     
-    // إضافة الصور الجديدة
     newImages.forEach((image, index) => {
       formData.append(`images[${index}]`, image);
     });
     
-    // إضافة قائمة الصور المراد حذفها
     if (imagesToDelete.length > 0) {
       formData.append('images_to_delete', JSON.stringify(imagesToDelete));
     }

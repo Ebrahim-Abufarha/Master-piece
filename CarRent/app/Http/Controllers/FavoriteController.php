@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
-    // عرض السيارات المفضلة للمستخدم
     public function index(Request $request)
     {
         $favorites = Favorite::with(['car.images'])
@@ -21,7 +20,6 @@ class FavoriteController extends Controller
             'message' => 'Favorite cars retrieved successfully'
         ]);
     }
-    // إضافة سيارة للمفضلة
     public function store(Request $request)
 {
     // التحقق من أن car_id و user_id موجودين في الـ request
@@ -40,10 +38,8 @@ class FavoriteController extends Controller
 }
 
 
-    // إزالة سيارة من المفضلة
     public function destroy($carId,Request $request)
     {
-        // $user = Auth::user();
 
         $favorite = Favorite::where('user_id', $request->id)
             ->where('car_id', $carId)

@@ -25,6 +25,8 @@ const SidebarAdmin: React.FC = () => {
   };
 
   const links = [
+    { path: '/admin/Profile', label: 'My-Profile', icon: 'bi-calendar-check' },
+
     { path: '/admin/AdminDashboard', label: 'AdminDashboard', icon: 'bi-people' },
     { path: '/admin/users', label: 'Users', icon: 'bi-people' },
     { path: '/admin/cars', label: 'Cars', icon: 'bi-car-front' },
@@ -45,7 +47,7 @@ const SidebarAdmin: React.FC = () => {
         boxShadow: '2px 0 10px rgba(0,0,0,0.2)',
       }}
     >
-      <h4 className="text-center mb-4">🚀 Admin Panel</h4>
+      <h4 style={{ color:"white" }} className="text-center mb-4">🚀 Admin Panel</h4>
       <ul style={{ listStyle: 'none', padding: '0' }}>
         {links.map((link, index) => (
           <li key={index} className="mb-2">

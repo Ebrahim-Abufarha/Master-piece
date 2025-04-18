@@ -8,10 +8,8 @@ export default function EditUser() {
 
 
 
-// أضف في الأعلى
 const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-// دالة التحقق
 const validateForm = () => {
   const newErrors: { [key: string]: string } = {};
 
@@ -39,7 +37,6 @@ const validateForm = () => {
 
 
 
-// عند الإرسال
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 

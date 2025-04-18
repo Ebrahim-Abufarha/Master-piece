@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    // عرض معلومات المستخدم
     public function show($id)
 {
     try {
@@ -56,7 +55,6 @@ class UserController extends Controller
     }
 }
 
-    // عرض سجلات الحجز للمستخدم
     public function bookings($id)
     {
         try {
@@ -83,15 +81,13 @@ class UserController extends Controller
 
             $data = $request->only(['name', 'email', 'phone', 'address']);
 
-            // تحديث الباسورد إذا تم إدخاله
             if ($request->filled('password')) {
                 $data['password'] = bcrypt($request->password);
             }
 
-            // رفع الصورة وتخزينها في profile_images داخل storage
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 $file = $request->file('image');
-                $path = $file->store('profile_images', 'public'); // يخزن في storage/app/public/profile_images
+                $path = $file->store('profile_images', 'public'); 
                 $data['image'] = $path;
             }
 

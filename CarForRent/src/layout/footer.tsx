@@ -7,13 +7,13 @@ export default function Footer() {
             <div className="col-md">
               <div className="ftco-footer-widget mb-4">
                 <h2 className="ftco-heading-2">
-                  <a href="#" className="logo">
-                    Car<span>book</span>
+                  <a href="/" className="logo">
+                    Car<span>Rental</span>
                   </a>
                 </h2>
                 <p>
-                  Far far away, behind the word mountains, far from the
-                  countries Vokalia and Consonantia, there live the blind texts.
+                  We provide the best car rental experience with competitive prices and high-quality vehicles. 
+                  Choose from our wide range of cars to suit all your needs.
                 </p>
                 <ul className="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
                   <li className="ftco-animate">
@@ -39,28 +39,28 @@ export default function Footer() {
                 <h2 className="ftco-heading-2">Information</h2>
                 <ul className="list-unstyled">
                   <li>
-                    <a href="#" className="py-2 d-block">
-                      About
+                    <a href="/about" className="py-2 d-block">
+                      About Us
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="py-2 d-block">
-                      Services
+                    <a href="/services" className="py-2 d-block">
+                      Our Services
+                    </a>
+                  </li>
+                  {/* <li>
+                    <a href="/pricing" className="py-2 d-block">
+                      Pricing Plans
+                    </a>
+                  </li> */}
+                  <li>
+                    <a href="/cars" className="py-2 d-block">
+                      Our Fleet
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="py-2 d-block">
-                      Term and Conditions
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="py-2 d-block">
-                      Best Price Guarantee
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="py-2 d-block">
-                      Privacy &amp; Cookies Policy
+                    <a href="/contact" className="py-2 d-block">
+                      Contact Us
                     </a>
                   </li>
                 </ul>
@@ -71,28 +71,28 @@ export default function Footer() {
                 <h2 className="ftco-heading-2">Customer Support</h2>
                 <ul className="list-unstyled">
                   <li>
-                    <a href="#" className="py-2 d-block">
+                    <a href="/faq" className="py-2 d-block">
                       FAQ
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="py-2 d-block">
-                      Payment Option
+                    <a href="/register" className="py-2 d-block">
+                      How to Register
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="py-2 d-block">
-                      Booking Tips
+                    <a href="/favorites" className="py-2 d-block">
+                      Your Favorites
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="py-2 d-block">
-                      How it works
+                    <a href="/contact" className="py-2 d-block">
+                      Rental Policies
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="py-2 d-block">
-                      Contact Us
+                    <a href="/contact" className="py-2 d-block">
+                      24/7 Support
                     </a>
                   </li>
                 </ul>
@@ -100,26 +100,25 @@ export default function Footer() {
             </div>
             <div className="col-md">
               <div className="ftco-footer-widget mb-4">
-                <h2 className="ftco-heading-2">Have a Questions?</h2>
+                <h2 className="ftco-heading-2">Have a Question?</h2>
                 <div className="block-23 mb-3">
                   <ul>
                     <li>
                       <i className="fas fa-map-marker-alt mr-2"></i>
                       <span className="text">
-                        203 Fake St. Mountain View, San Francisco, California,
-                        USA
+                        123 Rental Street, Downtown, City, Country
                       </span>
                     </li>
                     <li>
                       <a href="#">
                         <i className="fas fa-phone mr-2"></i>
-                        <span className="text">+2 392 3929 210</span>
+                        <span className="text">+1 234 567 8900</span>
                       </a>
                     </li>
                     <li>
                       <a href="#">
                         <i className="fas fa-envelope mr-2"></i>
-                        <span className="text">info@yourdomain.com</span>
+                        <span className="text">info@carrental.com</span>
                       </a>
                     </li>
                   </ul>
@@ -130,12 +129,8 @@ export default function Footer() {
           <div className="row">
             <div className="col-md-12 text-center">
               <p>
-                &copy; {new Date().getFullYear()} All rights reserved | This
-                template is made with{" "}
-                <i className="fas fa-heart text-danger"></i> by{" "}
-                <a href="https://colorlib.com" target="_blank" rel="noreferrer">
-                  Colorlib
-                </a>
+                &copy; {new Date().getFullYear()} CarRental. All rights reserved | 
+                Made with <i className="fas fa-heart text-danger"></i> by CarRental Team
               </p>
             </div>
           </div>

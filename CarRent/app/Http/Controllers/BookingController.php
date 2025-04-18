@@ -23,7 +23,6 @@ class BookingController extends Controller
         return response()->json(['bookedDates' => $bookedDates]);
     }
 
-    // دالة لحفظ الحجز
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -35,7 +34,6 @@ class BookingController extends Controller
             'status' => 'required|string',
         ]);
 
-        // حفظ الحجز في قاعدة البيانات
         $booking = Booking::create([
             'user_id' => $validated['user_id'],
             'car_id' => $validated['car_id'],

@@ -24,9 +24,11 @@ const SideBarLessor: React.FC = () => {
   };
 
   const links = [
+    { path: '/lessor/Profile', label: 'My-Profile', icon: 'bi-calendar-check' },
+
     { path: '/lessor/LessorDashboard', label: 'LessorDashboard', icon: 'bi-people' },
     { path: '/lessor/LessorCarsPage', label: 'Cars', icon: 'bi-car-front' },
-    { path: '/lessor/Review', label: 'Reviews', icon: 'bi-chat-square-text' },
+    // { path: '/lessor/Review', label: 'Reviews', icon: 'bi-chat-square-text' },
     { path: '/lessor/Booking', label: 'Bookings', icon: 'bi-calendar-check' },
   ];
 
@@ -42,7 +44,7 @@ const SideBarLessor: React.FC = () => {
         boxShadow: '2px 0 10px rgba(0,0,0,0.2)',
       }}
     >
-      <h4 className="text-center mb-4">🚀 Admin Panel</h4>
+      <h4 style={{ color:"white" }} className="text-center mb-4">🚀 Lessor Panel</h4>
       <ul style={{ listStyle: 'none', padding: '0' }}>
         {links.map((link, index) => (
           <li key={index} className="mb-2">

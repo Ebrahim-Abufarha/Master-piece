@@ -60,12 +60,12 @@ const LessorCarsPage: React.FC = () => {
   return (
     <div style={{ marginLeft: '250px', padding: '20px' }}>
       <h2 className="mb-4">My Cars</h2>
-      <Link to="/lessor/add-car" className="btn btn-primary">
+      <Link to="/lessor/add-car" className="btn btn-success">
           <i className="fas fa-plus me-2"></i> Add New Car
         </Link>
       {loading ? (
         <div className="text-center">
-          <div className="spinner-border text-primary" role="status">
+          <div className="spinner-border text-success" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>

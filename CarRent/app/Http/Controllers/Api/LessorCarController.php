@@ -22,7 +22,6 @@ class LessorCarController extends Controller
 
    public function show(Car $car, $id)
 {
-    // تحقق من أن السيارة تنتمي للمؤجر المحدد
     if ($car->user_id != $id) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
@@ -45,6 +44,7 @@ public function store(Request $request)
         'description' => 'required|string',
         'price_per_day' => 'required|numeric|min:0',
         'location' => 'required|string|max:255',
+        'add' => 'nullable|numeric',
         'car_type' => 'required|string|max:50',
         'seats' => 'required|integer|min:1',
         'transmission' => 'required|string|max:50',
@@ -77,7 +77,6 @@ public function store(Request $request)
 }
 
 
-  // في الـ controller، تأكد من التحقق من البيانات قبل محاولة التحديث
   public function update(Request $request, $id, $lessorId)
   {
       try {
@@ -90,7 +89,6 @@ public function store(Request $request)
               'name', 'color', 'description', 'price_per_day'
           ]));
 
-          // التعامل مع حذف الصور المحددة
           if ($request->has('images_to_delete')) {
               $imagesToDelete = json_decode($request->images_to_delete);
               foreach ($imagesToDelete as $imageId) {
@@ -102,7 +100,6 @@ public function store(Request $request)
               }
           }
 
-          // إضافة صور جديدة
           if ($request->hasFile('images')) {
               foreach ($request->file('images') as $imageFile) {
                   $path = $imageFile->store('cars', 'public');

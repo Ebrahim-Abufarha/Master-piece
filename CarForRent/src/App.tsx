@@ -33,6 +33,10 @@ import EditCar from './Lessor/EditCar';
 import LessorBookingsPage from './Lessor/LessorBooking';
 import LessorReviewsPage from './Lessor/LessorReview';
 import AddCarPage from './Lessor/AddCar';
+import LessorsProfile from './Lessor/LessorProfile';
+import EditLessorProfile from './Lessor/LessorEditProfile';
+import AdminsProfile from './Admin/AdminProfile';
+import EditAdminProfile from './Admin/AdminEditProfile';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -57,6 +61,7 @@ const App: React.FC = () => {
     <Router>
       <Layout>
         <Routes>
+                      {/* user pages */}
           <Route path="/" element={<Home />} />
           <Route path="cars" element={<Cars />} />
           <Route path="contact" element={<Contact />} />
@@ -70,7 +75,7 @@ const App: React.FC = () => {
           <Route path="/users/:id/edit" element={<EditUser />} />
           <Route path="/favorites" element={<FavoriteCars />} />
 
-          {/* صفحات الأدمن */}
+                                {/* Admins pages*/}
           <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/AdminDashboard" element={<AdminDashboard />} />
           <Route path="/admin/users/create" element={<AddUser />} />
@@ -81,10 +86,11 @@ const App: React.FC = () => {
           <Route path="/admin/AdminReviewsPage" element={<AdminReviewsPage />} />
           <Route path="/admin/AdminBookingsPage" element={<AdminBookingsPage />} />
           <Route path="/admin/ContactDetailsPage/:id" element={<AdminContactDetailsPage />} />
+          <Route path="/admin/Profile" element={<AdminsProfile />} />
+          <Route path="/admin/:id/edit" element={<EditAdminProfile />} />
 
 
-
-
+                            {/* lessor pages */}
           <Route path="/lessor/LessorDashboard" element={<LessorDashboard />} />
           <Route path="/lessor/LessorCarsPage" element={<LessorCarsPage />} />
           <Route path="/lessor/CarDetailsPage/:id" element={<LessorCarDetailsPage />} />
@@ -92,6 +98,8 @@ const App: React.FC = () => {
           <Route path="/lessor/Booking" element={<LessorBookingsPage />} />
           <Route path="/lessor/Review" element={<LessorReviewsPage />} />
           <Route path="/lessor/add-car" element={<AddCarPage />} />
+          <Route path="/lessor/Profile" element={<LessorsProfile />} />
+          <Route path="/lessor/:id/edit" element={<EditLessorProfile />} />
 
 
 

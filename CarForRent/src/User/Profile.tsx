@@ -30,7 +30,7 @@ interface ApiResponse {
   };
 }
 
-const BOOKINGS_PER_PAGE = 6;
+const BOOKINGS_PER_PAGE = 4;
 
 export default function UserProfile() {
   const { id } = useParams<{ id: string }>();

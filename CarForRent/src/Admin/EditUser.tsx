@@ -11,6 +11,8 @@ interface UserForm {
   phone: string;
   address: string;
   image: File | null;
+  currentImage?: string; 
+  removeImage?: boolean; 
 }
 
 const EditUsers: React.FC = () => {
@@ -24,14 +26,24 @@ const EditUsers: React.FC = () => {
     phone: '',
     address: '',
     image: null,
+    currentImage: '',
+    removeImage: false,
   });
 
   useEffect(() => {
     if (id) {
       axios.get(`http://localhost:8000/api/admin/users/${id}`)
         .then(response => {
-          const { name, email, role, phone, address } = response.data;
-          setFormData({ name, email, role, phone, address, image: null });
+          const { name, email, role, phone, address, image } = response.data;
+          setFormData(prev => ({ 
+            ...prev, 
+            name, 
+            email, 
+            role, 
+            phone, 
+            address, 
+            currentImage: image ? `http://localhost:8000/storage/${image}` : '' 
+          }));
         })
         .catch(err => {
           console.error('Error fetching user:', err);
@@ -40,13 +52,22 @@ const EditUsers: React.FC = () => {
   }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+    
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
   };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
-      setFormData(prev => ({ ...prev, image: e.target.files![0] }));
+      setFormData(prev => ({ 
+        ...prev, 
+        image: e.target.files![0],
+        removeImage: false 
+      }));
     }
   };
 
@@ -62,9 +83,12 @@ const EditUsers: React.FC = () => {
     if (formData.image) {
       data.append('image', formData.image);
     }
+    if (formData.removeImage) {
+      data.append('remove_image', 'true');
+    }
 
     try {
-      await axios.post(`http://localhost:8000/api/users/${id}?_method=PUT`, data, {
+      await axios.post(`http://localhost:8000/api/admin/users/${id}?_method=PUT`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       navigate('/admin/users');
@@ -111,7 +135,31 @@ const EditUsers: React.FC = () => {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Image</label>
+              <label className="form-label">Current Image</label>
+              {formData.currentImage && (
+                <div className="mb-2">
+                  <img 
+                    src={formData.currentImage} 
+                    alt="Current User" 
+                    style={{ maxWidth: '200px', maxHeight: '200px' }} 
+                    className="img-thumbnail"
+                  />
+                  {/* <div className="form-check mt-2">
+                    <input 
+                      className="form-check-input" 
+                      type="checkbox" 
+                      name="removeImage" 
+                      id="removeImage"
+                      checked={formData.removeImage || false}
+                      onChange={handleChange}
+                    />
+                    <label className="form-check-label" htmlFor="removeImage">
+                      Remove current image
+                    </label>
+                  </div> */}
+                </div>
+              )}
+              <label className="form-label">New Image</label>
               <input type="file" name="image" className="form-control" onChange={handleImageChange} />
             </div>
 

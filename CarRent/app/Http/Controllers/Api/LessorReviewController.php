@@ -8,15 +8,12 @@ use Illuminate\Http\Request;
 
 class LessorReviewController extends Controller
 {
-    // لعرض المراجعات الخاصة بسيارات اليسور
     public function index($lessorId)
     {
-        // جلب جميع السيارات التي يملكها اليسور
         $cars = Car::where('user_id', $lessorId)->pluck('id');
 
-        // جلب المراجعات لجميع السيارات التي يمتلكها اليسور
         $reviews = Review::with(['user', 'car'])
-                        ->whereIn('car_id', $cars) // تصفية المراجعات حسب السيارات الخاصة باليسور
+                        ->whereIn('car_id', $cars)
                         ->orderBy('created_at', 'desc')
                         ->get();
 
@@ -25,14 +22,12 @@ class LessorReviewController extends Controller
 
 
 
-    // عرض تفاصيل مراجعة معينة
     public function show(Review $review)
     {
         $review->load(['user', 'car']);
         return response()->json(['data' => $review]);
     }
 
-    // حذف مراجعة معينة
     public function destroy(Review $review)
     {
         $review->delete();

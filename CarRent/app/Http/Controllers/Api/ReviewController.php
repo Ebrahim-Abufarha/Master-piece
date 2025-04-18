@@ -11,17 +11,15 @@ use App\Models\User;
 
 class ReviewController extends Controller
 {
-    // 📥 إضافة تعليق جديد
     public function store(Request $request)
     {
         $request->validate([
             'car_id' => 'required|exists:cars,id',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string',
-            'user_id' => 'required|exists:users,id' // التحقق من أن user_id موجود في قاعدة البيانات
+            'user_id' => 'required|exists:users,id'
         ]);
 
-        // استخدام الـ user_id الذي تم إرساله من العميل
         $user = User::find($request->user_id);
 
         $hasBooked = Booking::where('user_id', $user->id)
@@ -43,7 +41,6 @@ class ReviewController extends Controller
         return response()->json($review, 201);
     }
 
-    // 📤 عرض تعليقات سيارة معينة
     public function index($car_id)
     {
         $reviews = Review::with('user')

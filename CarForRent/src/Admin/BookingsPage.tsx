@@ -51,19 +51,19 @@ const AdminBookingsPage: React.FC = () => {
     fetchBookings();
   }, []);
 
-  const handleStatusChange = async (id: number, newStatus: Booking['status']) => {
-    try {
-      await axios.put(`http://localhost:8000/api/admin/bookings/${id}`, {
-        status: newStatus
-      });
-      setBookings(prev => prev.map(booking => 
-        booking.id === id ? { ...booking, status: newStatus } : booking
-      ));
-    } catch (error) {
-      console.error('Error updating booking status:', error);
-      alert('Failed to update booking status');
-    }
-  };
+  // const handleStatusChange = async (id: number, newStatus: Booking['status']) => {
+  //   try {
+  //     await axios.put(`http://localhost:8000/api/admin/bookings/${id}`, {
+  //       status: newStatus
+  //     });
+  //     setBookings(prev => prev.map(booking => 
+  //       booking.id === id ? { ...booking, status: newStatus } : booking
+  //     ));
+  //   } catch (error) {
+  //     console.error('Error updating booking status:', error);
+  //     alert('Failed to update booking status');
+  //   }
+  // };
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this booking?')) return;
@@ -128,8 +128,19 @@ const AdminBookingsPage: React.FC = () => {
                         {new Date(booking.end_date).toLocaleDateString('en-US')}
                       </td>
                       <td>${Number(booking.total).toFixed(2)}</td>
-
                       <td>
+  <span
+    className={`badge ${
+      booking.status === 'pending' ? 'bg-warning text-white' :
+      booking.status === 'confirmed' ? 'bg-success text-white' :
+      'bg-danger text-white'
+    }`}
+    style={{ padding: '5px 10px', borderRadius: '5px' }}
+  >
+    {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+  </span>
+</td>
+{/* <td>
                         <select
                           value={booking.status}
                           onChange={(e) => handleStatusChange(
@@ -147,7 +158,7 @@ const AdminBookingsPage: React.FC = () => {
                           <option value="confirmed">Confirmed</option>
                           <option value="cancelled">Cancelled</option>
                         </select>
-                      </td>
+                      </td> */}
                       <td>
                         <button
                           onClick={() => handleDelete(booking.id)}

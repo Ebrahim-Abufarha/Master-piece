@@ -72,6 +72,8 @@ interface PaymentInfo {
   cardHolder: string;
   expiryDate: string;
   cvv: string;
+  paymentType: 'card' | 'cash';
+  depositPaymentDetails?: string;
 }
 
 const getImage = (car: Car & { images?: { image_path: string }[] }) => {
@@ -98,7 +100,8 @@ export default function CarSingle() {
     cardNumber: '',
     cardHolder: '',
     expiryDate: '',
-    cvv: ''
+    cvv: '',
+    paymentType: 'card'
   });
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -145,14 +148,6 @@ export default function CarSingle() {
     return false;
   };
 
-  const handlePaymentInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPaymentInfo(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
   const handleProceedToPayment = () => {
     if (!startDate || !endDate || !car) {
       alert("Please select a start and end date.");
@@ -182,21 +177,26 @@ export default function CarSingle() {
     }
   
     // Validate payment information
-    if (!paymentInfo.cardNumber || !paymentInfo.cardHolder || !paymentInfo.expiryDate || !paymentInfo.cvv) {
-      alert("Please fill in all payment details.");
-      return;
-    }
+    if (paymentInfo.paymentType === 'card') {
+      if (!paymentInfo.cardNumber || !paymentInfo.cardHolder || !paymentInfo.expiryDate || !paymentInfo.cvv) {
+        alert("Please fill in all payment details.");
+        return;
+      }
   
-    // Basic card number validation (should be 16 digits)
-    if (!/^\d{16}$/.test(paymentInfo.cardNumber.replace(/\s/g, ''))) {
-      alert("Please enter a valid 16-digit card number.");
-      return;
-    }
+      // Basic card number validation (should be 16 digits)
+      if (!/^\d{16}$/.test(paymentInfo.cardNumber.replace(/\s/g, ''))) {
+        alert("Please enter a valid 16-digit card number.");
+        return;
+      }
   
-    // Basic CVV validation (should be 3 or 4 digits)
-    if (!/^\d{3,4}$/.test(paymentInfo.cvv)) {
-      alert("Please enter a valid CVV (3 or 4 digits).");
-      return;
+      // Basic CVV validation (should be 3 or 4 digits)
+      if (!/^\d{3,4}$/.test(paymentInfo.cvv)) {
+        alert("Please enter a valid CVV (3 or 4 digits).");
+        return;
+      }
+    } else if (paymentInfo.paymentType === 'cash') {
+      // Ensure deposit is paid for cash payment
+      // Removed the alert and confirmation logic
     }
   
     setPaymentProcessing(true);
@@ -211,20 +211,22 @@ export default function CarSingle() {
     const days = Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24));
     const totalPrice = days * (car.price_per_day || 0);
   
+    const paymentType = paymentInfo.paymentType;
+    const totalAmount = paymentType === 'cash' ? totalPrice + 5 : totalPrice;
+
     try {
-      // First process the payment (this would connect to your payment API)
-      // For this example, we'll simulate a payment processing delay
+      // Simulate payment processing delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Then create the booking
+      // Create the booking
       await axios.post('http://localhost:8000/api/bookings', {
         user_id: userIdNumber,
         car_id: car.id,
         start_date: startDate.toISOString().split('T')[0],
         end_date: endDate.toISOString().split('T')[0],
-        total: totalPrice,
+        total: totalAmount,
         status: 'confirmed',
-        payment_method: 'card'
+        payment_method: paymentType
       });
   
       alert("Payment successful! Your booking has been confirmed.");
@@ -236,7 +238,8 @@ export default function CarSingle() {
         cardNumber: '',
         cardHolder: '',
         expiryDate: '',
-        cvv: ''
+        cvv: '',
+        paymentType: 'card'
       });
       
       // Reset date selection
@@ -296,48 +299,6 @@ export default function CarSingle() {
     }
   };
 
-  const handleAddComment = async () => {
-    if (!newComment || rating === 0) {
-      alert('Please add both a comment and a rating');
-      return;
-    }
-  
-    try {
-      const token = localStorage.getItem('token');
-      const userId = localStorage.getItem('user_id');
-      if (!token || !userId) {
-        alert('You must be logged in to comment');
-        return;
-      }
-  
-      const response = await axios.post(
-        'http://localhost:8000/api/reviews',
-        {
-          car_id: id,
-          user_id: userId,
-          rating,
-          comment: newComment
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-  
-      setReviews([response.data, ...reviews]);
-      setNewComment('');
-      setRating(0);
-      setShowCommentForm(false);
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response?.status === 403) {
-        alert(error.response.data.message);
-      } else {
-        alert('An error occurred while adding the comment');
-      }
-    }
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -378,6 +339,41 @@ export default function CarSingle() {
         <h2>Car not found</h2>
       </div>
     );
+  }
+
+  async function handleAddComment(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> {
+    event.preventDefault();
+
+    if (!newComment.trim() || rating === 0) {
+      alert("Please provide a rating and a comment.");
+      return;
+    }
+
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+      alert("You must be logged in to add a comment.");
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/reviews', {
+        user_id: parseInt(userId, 10),
+        car_id: car?.id,
+        rating,
+        comment: newComment.trim(),
+      });
+
+      if (response.status === 201) {
+        alert("Your review has been added successfully.");
+        setReviews((prevReviews) => [...prevReviews, response.data]);
+        setNewComment('');
+        setRating(0);
+        setShowCommentForm(false);
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      alert("There was an error adding your comment. Please try again.");
+    }
   }
 
   return (
@@ -463,16 +459,16 @@ export default function CarSingle() {
                         &lt;
                       </button>
                       <div
-  className="img rounded"
-  style={{
-    width: '100%',
-    height: '400px',
-    backgroundImage: `url(http://localhost:8000/storage/${car.images[currentImageIndex].image_path})`,
-    backgroundSize: 'contain', // تعديل هنا
-    backgroundRepeat: 'no-repeat', // منع تكرار الصورة
-    backgroundPosition: 'center', // تمركز الصورة
-  }}
-></div>
+                        className="img rounded"
+                        style={{
+                          width: '100%',
+                          height: '400px',
+                          backgroundImage: `url(http://localhost:8000/storage/${car.images[currentImageIndex].image_path})`,
+                          backgroundSize: 'contain', 
+                          backgroundRepeat: 'no-repeat', 
+                          backgroundPosition: 'center', 
+                        }}
+                      ></div>
                       <button
                         className="btn btn-dark position-absolute"
                         style={{ right: '10px', zIndex: 10 }}
@@ -510,99 +506,6 @@ export default function CarSingle() {
               </div>
             </div>
           </div>
-          
-          <div className="row">
-  <div className="col-md d-flex align-self-stretch ftco-animate">
-    <div className="media block-6 services">
-      <div className="media-body py-md-4">
-        <div className="d-flex mb-3 align-items-center">
-          <div className="icon d-flex align-items-center justify-content-center">
-            <i className="fas fa-palette"></i>
-          </div>
-          <div className="text">
-            <h3 className="heading mb-0 pl-3">
-              Color
-              <span> {car.color}</span>
-            </h3>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div className="col-md d-flex align-self-stretch ftco-animate">
-    <div className="media block-6 services">
-      <div className="media-body py-md-4">
-        <div className="d-flex mb-3 align-items-center">
-          <div className="icon d-flex align-items-center justify-content-center">
-            <i className="fas fa-cogs"></i>
-          </div>
-          <div className="text">
-            <h3 className="heading mb-0 pl-3">
-              Transmission
-              <span> {car.transmission}</span>
-            </h3>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div className="col-md d-flex align-self-stretch ftco-animate">
-    <div className="media block-6 services">
-      <div className="media-body py-md-4">
-        <div className="d-flex mb-3 align-items-center">
-          <div className="icon d-flex align-items-center justify-content-center">
-            <i className="fas fa-chair"></i>
-          </div>
-          <div className="text">
-            <h3 className="heading mb-0 pl-3">
-              Seats
-              <span> {car.seats} Adults</span>
-            </h3>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div className="col-md d-flex align-self-stretch ftco-animate">
-    <div className="media block-6 services">
-      <div className="media-body py-md-4">
-        <div className="d-flex mb-3 align-items-center">
-          <div className="icon d-flex align-items-center justify-content-center">
-            <i className="fas fa-circle"></i>
-          </div>
-          <div className="text">
-            <h3 className="heading mb-0 pl-3">
-              Status
-              <span> {car.status}</span>
-            </h3>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div className="col-md d-flex align-self-stretch ftco-animate">
-    <div className="media block-6 services">
-      <div className="media-body py-md-4">
-        <div className="d-flex mb-3 align-items-center">
-          <div className="icon d-flex align-items-center justify-content-center">
-            <i className="fas fa-gas-pump"></i>
-          </div>
-          <div className="text">
-            <h3 className="heading mb-0 pl-3">
-              Fuel
-              <span> {car.fuel_type}</span>
-            </h3>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
           
           <div className="row">
             <div className="col-md-12 pills">
@@ -742,22 +645,24 @@ export default function CarSingle() {
                     settings: {
                       slidesToShow: 3,
                       slidesToScroll: 3,
-                    },
+                      infinite: true,
+                      dots: true
+                    }
                   },
                   {
-                    breakpoint: 768,
+                    breakpoint: 600,
                     settings: {
                       slidesToShow: 2,
-                      slidesToScroll: 2,
-                    },
+                      slidesToScroll: 2
+                    }
                   },
                   {
-                    breakpoint: 576,
+                    breakpoint: 480,
                     settings: {
                       slidesToShow: 1,
-                      slidesToScroll: 1,
-                    },
-                  },
+                      slidesToScroll: 1
+                    }
+                  }
                 ]}
               >
                 {relatedCars.map((relatedCar) => (
@@ -878,75 +783,176 @@ export default function CarSingle() {
             
             <Form className="payment-form">
               <Form.Group>
-                <Form.Label>Card Number</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  name="cardNumber"
-                  value={paymentInfo.cardNumber}
-                  onChange={handlePaymentInfoChange}
-                  placeholder="1234 5678 9012 3456"
-                  maxLength={19}
-                  required
-                />
+                <Form.Label>Payment Method</Form.Label>
+                <div>
+                  <Form.Check
+                    inline
+                    type="radio"
+                    label="Credit/Debit Card"
+                    name="paymentType"
+                    value="card"
+                    checked={paymentInfo.paymentType === 'card'}
+                    onChange={() => setPaymentInfo({ ...paymentInfo, paymentType: 'card' })}
+                    id="payment-card"
+                  />
+                  <Form.Check
+                    inline
+                    type="radio"
+                    label="Cash on Delivery (+$5 fee)"
+                    name="paymentType"
+                    value="cash"
+                    checked={paymentInfo.paymentType === 'cash'}
+                    onChange={() => setPaymentInfo({ ...paymentInfo, paymentType: 'cash' })}
+                    id="payment-cash"
+                  />
+                </div>
               </Form.Group>
-              
-              <Form.Group>
-                <Form.Label>Card Holder Name</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  name="cardHolder"
-                  value={paymentInfo.cardHolder}
-                  onChange={handlePaymentInfoChange}
-                  placeholder="John Doe"
-                  required
-                />
-              </Form.Group>
-              
-              <div className="row">
-                <div className="col-md-6">
+
+              {paymentInfo.paymentType === 'card' && (
+                <>
                   <Form.Group>
-                    <Form.Label>Expiry Date</Form.Label>
+                    <Form.Label>Card Number</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="cardNumber"
+                      value={paymentInfo.cardNumber}
+                      onChange={(e) => setPaymentInfo({ ...paymentInfo, cardNumber: e.target.value })}
+                      placeholder="1234 5678 9012 3456"
+                      required
+                      maxLength={16}
+                    />
+                  </Form.Group>
+
+                  <Form.Group>
+                    <Form.Label>Card Holder Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="cardHolder"
+                      value={paymentInfo.cardHolder}
+                      onChange={(e) => setPaymentInfo({ ...paymentInfo, cardHolder: e.target.value })}
+                      placeholder="John Doe"
+                      required
+                    />
+                  </Form.Group>
+
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group>
+                        <Form.Label>Expiry Date</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="expiryDate"
+                          value={paymentInfo.expiryDate}
+                          onChange={(e) => setPaymentInfo({ ...paymentInfo, expiryDate: e.target.value })}
+                          placeholder="MM/YY"
+                          maxLength={5}
+                          required
+                        />
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-6">
+                      <Form.Group>
+                        <Form.Label>CVV</Form.Label>
+                        <Form.Control
+                          type="password"
+                          name="cvv"
+                          value={paymentInfo.cvv}
+                          onChange={(e) => setPaymentInfo({ ...paymentInfo, cvv: e.target.value })}
+                          placeholder="123"
+                          maxLength={4}
+                          required
+                        />
+                      </Form.Group>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {paymentInfo.paymentType === 'cash' && (
+                <>
+                  <div className="alert alert-info">
+                    <p className="mb-0">
+                      Pay a $20 deposit now to secure your booking. The remaining amount will be collected at pickup. A $5 processing fee applies to cash payments.
+                    </p>
+                  </div>
+                  <Form.Group>
+                    <Form.Label>Card Number</Form.Label>
                     <Form.Control 
                       type="text" 
-                      name="expiryDate"
-                      value={paymentInfo.expiryDate}
-                      onChange={handlePaymentInfoChange}
-                      placeholder="MM/YY"
-                      maxLength={5}
+                      name="cardNumber"
+                      value={paymentInfo.cardNumber}
+                      onChange={(e) => setPaymentInfo({ ...paymentInfo, cardNumber: e.target.value })}
+                      placeholder="1234 5678 9012 3456"
                       required
+                      maxLength={16}
                     />
                   </Form.Group>
-                </div>
-                <div className="col-md-6">
+                  
                   <Form.Group>
-                    <Form.Label>CVV</Form.Label>
+                    <Form.Label>Card Holder Name</Form.Label>
                     <Form.Control 
-                      type="password" 
-                      name="cvv"
-                      value={paymentInfo.cvv}
-                      onChange={handlePaymentInfoChange}
-                      placeholder="123"
-                      maxLength={4}
+                      type="text" 
+                      name="cardHolder"
+                      value={paymentInfo.cardHolder}
+                      onChange={(e) => setPaymentInfo({ ...paymentInfo, cardHolder: e.target.value })}
+                      placeholder="John Doe"
                       required
                     />
                   </Form.Group>
+                  
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group>
+                        <Form.Label>Expiry Date</Form.Label>
+                        <Form.Control 
+                          type="text" 
+                          name="expiryDate"
+                          value={paymentInfo.expiryDate}
+                          onChange={(e) => setPaymentInfo({ ...paymentInfo, expiryDate: e.target.value })}
+                          placeholder="MM/YY"
+                          maxLength={5}
+                          required
+                        />
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-6">
+                      <Form.Group>
+                        <Form.Label>CVV</Form.Label>
+                        <Form.Control 
+                          type="password" 
+                          name="cvv"
+                          value={paymentInfo.cvv}
+                          onChange={(e) => setPaymentInfo({ ...paymentInfo, cvv: e.target.value })}
+                          placeholder="123"
+                          maxLength={4}
+                          required
+                        />
+                      </Form.Group>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {startDate && endDate && car && (
+                <div className="payment-summary">
+                  <h6 className="mb-3">Payment Summary</h6>
+                  <p className="mb-1">Vehicle: {car.name}</p>
+                  <p className="mb-1">Duration: {Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24))} days</p>
+                  <p className="mb-1">Start Date: {startDate.toISOString().split('T')[0]}</p>
+                  <p className="mb-1">End Date: {endDate.toISOString().split('T')[0]}</p>
+                  <p className="mb-1">Base Price: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day}</p>
+                  {paymentInfo.paymentType === 'cash' && (
+                    <>
+                      <p className="mb-1">Cash Processing Fee: +$5</p>
+                      <p className="mb-1">Total Amount: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day + 5}</p>
+                      <hr />
+                      <p className="mb-1 font-weight-bold">Due Now (Deposit): $20</p>
+                      <p className="mb-0 font-weight-bold">Due at Pickup: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day + 5 - 20}</p>
+                    </>
+                  )}
                 </div>
-              </div>
+              )}
             </Form>
-            
-            {startDate && endDate && car && (
-              <div className="payment-summary">
-                <h6 className="mb-3">Payment Summary</h6>
-                <p className="mb-1">Vehicle: {car.name}</p>
-                <p className="mb-1">Duration: {Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24))} days</p>
-                <p className="mb-1">Start Date: {startDate.toISOString().split('T')[0]}</p>
-                <p className="mb-1">End Date: {endDate.toISOString().split('T')[0]}</p>
-                <hr />
-                <p className="mb-0 font-weight-bold">
-                  Total Amount: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day}
-                </p>
-              </div>
-            )}
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -956,7 +962,10 @@ export default function CarSingle() {
           <Button 
             variant="primary" 
             onClick={handleProcessPayment}
-            disabled={!paymentInfo.cardNumber || !paymentInfo.cardHolder || !paymentInfo.expiryDate || !paymentInfo.cvv || paymentProcessing}
+            disabled={
+              paymentInfo.paymentType === 'card' &&
+              (!paymentInfo.cardNumber || !paymentInfo.cardHolder || !paymentInfo.expiryDate || !paymentInfo.cvv || paymentProcessing)
+            }
           >
             {paymentProcessing ? (
               <>
@@ -964,7 +973,7 @@ export default function CarSingle() {
                 Processing...
               </>
             ) : (
-              'Complete Payment'
+              paymentInfo.paymentType === 'cash' ? 'Pay Deposit' : 'Complete Payment'
             )}
           </Button>
         </Modal.Footer>
