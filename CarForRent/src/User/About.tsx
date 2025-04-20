@@ -117,7 +117,7 @@ export default function About(){
       </div>
     </section> */}
 
-    <section className="ftco-counter ftco-section img" id="section-counter">
+    {/* <section className="ftco-counter ftco-section img" id="section-counter">
 			<div className="overlay"></div>
     	<div className="container">
     		<div className="row">
@@ -155,7 +155,7 @@ export default function About(){
           </div>
         </div>
     	</div>
-    </section>	
+    </section>	 */}
         </>
     )
 }
