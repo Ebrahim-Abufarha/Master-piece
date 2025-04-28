@@ -10,7 +10,7 @@ class Booking extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'car_id', 'start_date', 'end_date', 'status', 'total'];
+    protected $fillable = ['user_id', 'car_id', 'start_date', 'end_date', 'status', 'total','lessonImage'];
 
     public function user() {
         return $this->belongsTo(User::class); // renter

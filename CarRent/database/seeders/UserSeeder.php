@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
     {
         User::create([
             'name' => 'Admin',
-            'email' => 'admin@example.com',
+            'email' => 'admidn@example.com',
             'password' => bcrypt('password'), // تأكد من تشفير كلمة المرور
             'role' => 'admin',
             'image' => 'images/user/user.bmp',

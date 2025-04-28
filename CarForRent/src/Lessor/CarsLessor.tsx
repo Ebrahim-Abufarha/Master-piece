@@ -94,7 +94,7 @@ const LessorCarsPage: React.FC = () => {
                         <strong>Description:</strong>{' '}
                         {car.description.split(' ').slice(0, 10).join(' ')}...
                         <br />
-                        <strong>Price per day:</strong> ${car.price_per_day}
+                        <strong>Price per day:</strong> JD{car.price_per_day}
                       </p>
                       <div className="d-flex justify-content-between">
                         <Link

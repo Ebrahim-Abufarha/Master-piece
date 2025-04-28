@@ -70,7 +70,7 @@ Route::post('/{id}', [UserController::class, 'update']);
     Route::delete('/favorites/{carId}/{id}', [FavoriteController::class, 'destroy']);
 
 
-    Route::post('/reviews', [ReviewController::class, 'store']); 
+    Route::post('/reviews', [ReviewController::class, 'store']);
     Route::get('/reviews/{car_id}', [ReviewController::class, 'index']);
 
 

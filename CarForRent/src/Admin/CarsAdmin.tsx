@@ -72,7 +72,7 @@ const CarsPage: React.FC = () => {
                     <p className="card-text">
                       <strong>Color:</strong> {car.color}<br />
                       <strong>Description:</strong> {car.description.split(' ').slice(0, 10).join(' ')}...<br />
-                      <strong>Price per day:</strong> ${car.price_per_day}<br />
+                      <strong>Price per day:</strong> JD{car.price_per_day}<br />
                       {/* <strong>Status:</strong> {car.status} */}
                     </p>
                     <div className="d-flex justify-content-between">

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Modal, Button, Form, Pagination } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaHeart } from 'react-icons/fa';
@@ -7,10 +7,12 @@ import { FaHeart } from 'react-icons/fa';
 interface CarImage {
   image_path: string;
 }
+
 interface Lessor {
   id: number;
   name: string;
 }
+
 interface Car {
   id: number;
   name: string;
@@ -27,23 +29,35 @@ interface Booking {
   end_date: string;
 }
 
-const getImage = (car: Car & { images?: { image_path: string }[] }) => {
+interface PaymentSummary {
+  days: number;
+  basePrice: number;
+  totalPrice: number;
+  deposit: number;
+  additionalFee: number;
+}
+
+const ITEMS_PER_PAGE = 6;
+
+const getImage = (car: Car & { images?: { image_path: string }[] }): string => {
   return car.images && car.images.length > 0
     ? `http://localhost:8000/storage/${car.images[0].image_path}`
     : '/images/default-car.jpg';
 };
 
 export default function Cars() {
+  const [showTerms, setShowTerms] = useState<boolean>(false);
+  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const [cars, setCars] = useState<Car[]>([]);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
   const [paymentType, setPaymentType] = useState<'cash' | 'card'>('card');
   const [paymentInfo, setPaymentInfo] = useState({
     cardNumber: '',
@@ -51,18 +65,22 @@ export default function Cars() {
     expiryDate: '',
     cvv: ''
   });
-  
-  const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [paymentProcessing, setPaymentProcessing] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
+  // Fetch cars data on component mount
   useEffect(() => {
     fetch('http://localhost:8000/api/cars') 
       .then(response => response.json())
       .then(data => {
         setCars(data);
+        setTotalPages(Math.ceil(data.length / ITEMS_PER_PAGE));
       })
       .catch(error => console.error('Error fetching cars:', error));
   }, []);
 
+  // Fetch favorites on component mount
   useEffect(() => {
     const fetchFavorites = async () => {
       const user_id = localStorage.getItem("user_id");
@@ -86,7 +104,42 @@ export default function Cars() {
     fetchFavorites();
   }, []);
 
-  const fetchBookings = async (carId: number) => {
+  // Filter cars based on search term and category
+  const filteredCars = useMemo(() => {
+    return cars.filter(car => {
+      const carName = car.name ? car.name.toLowerCase() : '';
+      const carCategory = car.car_type ? car.car_type.toLowerCase() : '';
+    
+      return (
+        (carName.includes(searchTerm.toLowerCase()) || 
+        carCategory.includes(searchTerm.toLowerCase())) &&
+        (selectedCategory === 'All' || car.car_type === selectedCategory)
+      );
+    });
+  }, [cars, searchTerm, selectedCategory]);
+  
+  // Update total pages and reset to first page when filters change
+  useEffect(() => {
+    const newTotalPages = Math.ceil(filteredCars.length / ITEMS_PER_PAGE);
+    setTotalPages(newTotalPages);
+    setCurrentPage(1);
+  }, [filteredCars.length]);
+
+  // Calculate current page's cars
+  const currentCars = useMemo(() => {
+    console.log('Recalculating currentCars for page:', currentPage);
+    const indexOfLastCar = currentPage * ITEMS_PER_PAGE;
+    const indexOfFirstCar = indexOfLastCar - ITEMS_PER_PAGE;
+    return filteredCars.slice(indexOfFirstCar, indexOfLastCar);
+  }, [currentPage, filteredCars, ITEMS_PER_PAGE]);
+
+  // Log when current page changes for debugging
+  useEffect(() => {
+    console.log('Current page changed to:', currentPage);
+    console.log('Current cars:', currentCars);
+  }, [currentPage, currentCars]);
+
+  const fetchBookings = async (carId: number): Promise<void> => {
     try {
       const response = await fetch(`http://localhost:8000/api/bookings/car-single/${carId}`);
       const data = await response.json();
@@ -96,18 +149,18 @@ export default function Cars() {
     }
   };
 
-  const handleBookingClick = (car: Car) => {
+  const handleBookingClick = (car: Car): void => {
     setSelectedCar(car);
     fetchBookings(car.id);
     setShowModal(true);
   };
 
-  const handleStartDateChange = (date: Date | null) => {
+  const handleStartDateChange = (date: Date | null): void => {
     setStartDate(date);
     setEndDate(null);
   };
 
-  const handleFavoriteClick = async (carId: number) => {
+  const handleFavoriteClick = async (carId: number): Promise<void> => {
     const user_id = localStorage.getItem("user_id");
     const token = localStorage.getItem("token");
   
@@ -118,7 +171,6 @@ export default function Cars() {
   
     try {
       if (favorites.includes(carId)) {
-
         const response = await fetch(`http://localhost:8000/api/favorites/${carId}/${user_id}`, {
           method: "DELETE",
           headers: {
@@ -177,16 +229,20 @@ export default function Cars() {
     return false;
   };
 
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = (): void => {
     if (!startDate || !endDate || !selectedCar) {
       alert("Please select a start and end date.");
+      return;
+    }
+    if (!termsAccepted) {
+      alert("You must accept the terms and conditions to proceed.");
       return;
     }
     setShowModal(false);
     setShowPaymentModal(true);
   };
 
-  const handlePaymentInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePaymentInfoChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setPaymentInfo(prev => ({
       ...prev,
@@ -194,13 +250,12 @@ export default function Cars() {
     }));
   };
 
-  const handleProcessPayment = async () => {
+  const handleProcessPayment = async (): Promise<void> => {
     if (!startDate || !endDate || !selectedCar) {
       alert("Please select a start and end date.");
       return;
     }
   
-    // Only validate card details if payment type is card
     if (paymentType === 'card') {
       if (
         !paymentInfo.cardNumber ||
@@ -234,14 +289,8 @@ export default function Cars() {
   
     const days = Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24));
     const basePrice = days * selectedCar.price_per_day;
-    
-    // Set total and status based on payment type
     const totalPrice = paymentType === 'cash' ? basePrice + 5 : basePrice;
-    
-    // Both payment types now have confirmed status
     const status = 'confirmed';
-    
-    // For cash payment, use fixed deposit of 20
     const amountToSend = paymentType === 'cash' ? 20 : totalPrice;
   
     try {
@@ -286,18 +335,79 @@ export default function Cars() {
     return isDateBooked(date) ? "booked-date" : "";
   };
 
-  const filteredCars = cars.filter(car => {
-    const carName = car.name ? car.name.toLowerCase() : '';
-    const carCategory = car.car_type ? car.car_type.toLowerCase() : '';
-  
-    return (
-      (carName.includes(searchTerm.toLowerCase()) || carCategory.includes(searchTerm.toLowerCase())) &&
-      (selectedCategory === 'All' || car.car_type === selectedCategory)
-    );
-  });
+  // Pagination handler - extracted for clarity and stability
+  const paginate = (pageNumber: number): void => {
+    console.log('Paginating to page:', pageNumber);
+    setCurrentPage(pageNumber);
+  };
 
-  // Calculate payment summary information
-  const calculatePaymentSummary = () => {
+  // Render pagination items with improved event handling
+  const renderPaginationItems = (): JSX.Element[] => {
+    const maxVisiblePages = 5;
+    const items: JSX.Element[] = [];
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let number = 1; number <= totalPages; number++) {
+        items.push(
+          <Pagination.Item 
+            key={number} 
+            active={number === currentPage}
+            onClick={() => {
+              console.log('Clicked on page:', number);
+              paginate(number);
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            {number}
+          </Pagination.Item>
+        );
+      }
+    } else {
+      const leftBound = Math.max(1, currentPage - 2);
+      const rightBound = Math.min(totalPages, currentPage + 2);
+      
+      if (leftBound > 1) {
+        items.push(
+          <Pagination.Item key={1} onClick={() => paginate(1)}>
+            1
+          </Pagination.Item>
+        );
+        if (leftBound > 2) {
+          items.push(<Pagination.Ellipsis key="left-ellipsis" />);
+        }
+      }
+      
+      for (let number = leftBound; number <= rightBound; number++) {
+        items.push(
+          <Pagination.Item 
+            key={number} 
+            active={number === currentPage}
+            onClick={() => {
+              console.log('Clicked on page:', number);
+              paginate(number);
+            }}
+          >
+            {number}
+          </Pagination.Item>
+        );
+      }
+      
+      if (rightBound < totalPages) {
+        if (rightBound < totalPages - 1) {
+          items.push(<Pagination.Ellipsis key="right-ellipsis" />);
+        }
+        items.push(
+          <Pagination.Item key={totalPages} onClick={() => paginate(totalPages)}>
+            {totalPages}
+          </Pagination.Item>
+        );
+      }
+    }
+    
+    return items;
+  };
+
+  const calculatePaymentSummary = (): PaymentSummary | null => {
     if (!startDate || !endDate || !selectedCar) return null;
     
     const days = Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24));
@@ -315,7 +425,6 @@ export default function Cars() {
   };
 
   const paymentSummary = calculatePaymentSummary();
-
   return (
     <>
       <style>
@@ -330,11 +439,16 @@ export default function Cars() {
             color: #ccc !important;
             text-decoration: line-through;
           }
+          .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+          }
         `}
       </style>
 
       <section
-      id='le'
+        id='le'
         className="hero-wrap hero-wrap-2 js-fullheight"
         style={{ backgroundImage: "url('/images/bg_3.jpg')" }}
         data-stellar-background-ratio="0.5"
@@ -380,57 +494,82 @@ export default function Cars() {
                 <option value="Sports">Sports</option>
               </select>
             </div>
-          {filteredCars.map((car) => (
-  <div key={car.id} className="col-md-4">
-    <div className="car-wrap rounded ftco-animate">
-      <div
-        className="img rounded d-flex align-items-end"
-        style={{ backgroundImage: `url(${getImage(car)})` }}
-      >
-      </div>
-      <div className="text">
-        <h2 className="mb-0"><a href={`car-single/${car.id}`}>{car.name}</a><span 
-  style={{ paddingLeft: "150px", cursor: "pointer" }} 
-  onClick={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleFavoriteClick(car.id);
-  }}
->
-  <FaHeart color={favorites.includes(car.id) ? "#01d28e" : "#ccc"} />
-</span></h2>
-        {/*  */}
-        {car.lessor && (
-    <div key={car.id} className="lessor-info mb-2">
-      <span className="text-muted">By: </span>    
-      <a href={`lessors/${car.lessor.id}`}>{car.lessor.name}</a>
-      </div>
-  )}
-  
-        
-        <div className="d-flex mb-3">
-          <span className="cat">color: {car.color}</span>
-          <span className="cat">{car.description}</span>
-          <p className="price ml-auto">${car.price_per_day} <span>/day</span></p>
-        </div>
-        <p className="d-flex mb-0 d-block">
-          <a 
-            href="#" 
-            className="btn btn-primary py-2 mr-1" 
-            onClick={(e) => {
-              e.preventDefault();
-              handleBookingClick(car);
-            }}
-          >
-            Book Now
-          </a>
-          <a href={`car-single/${car.id}`} className="btn btn-secondary py-2 ml-1">Details</a>
-        </p>
-      </div>
-    </div>
-  </div>
-))}
+            
+            {currentCars.length > 0 ? (
+              currentCars.map((car) => (
+                <div key={car.id} className="col-md-4">
+                  <div className="car-wrap rounded ftco-animate">
+                    <div
+                      className="img rounded d-flex align-items-end"
+                      style={{ backgroundImage: `url(${getImage(car)})` }}
+                    >
+                    </div>
+                    <div className="text">
+                      <h2 className="mb-0">
+                        <a href={`car-single/${car.id}`}>{car.name}</a>
+                        <span 
+                          style={{ paddingLeft: "150px", cursor: "pointer" }} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleFavoriteClick(car.id);
+                          }}
+                        >
+                          <FaHeart color={favorites.includes(car.id) ? "#01d28e" : "#ccc"} />
+                        </span>
+                      </h2>
+                      
+                      {car.lessor && (
+                        <div className="lessor-info mb-2">
+                          <span className="text-muted">By: </span>    
+                          <a href={`Carlessors/${car.lessor.id}`}>{car.lessor.name}</a>
+                        </div>
+                      )}
+                      
+                      <div className="d-flex mb-3">
+                        <span className="cat">color: {car.color}</span>
+                        <span className="cat">{car.description}</span>
+                        <p className="price ml-auto">JD{car.price_per_day} <span>/day</span></p>
+                      </div>
+                      <p className="d-flex mb-0 d-block">
+                        <a 
+                          href="#" 
+                          className="btn btn-primary py-2 mr-1" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleBookingClick(car);
+                          }}
+                        >
+                          Book Now
+                        </a>
+                        <a href={`car-single/${car.id}`} className="btn btn-secondary py-2 ml-1">Details</a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-12 text-center">
+                <h4>No cars found matching your criteria</h4>
+              </div>
+            )}
           </div>
+          
+          {filteredCars.length > ITEMS_PER_PAGE && (
+            <div className="pagination-container">
+              <Pagination>
+                <Pagination.Prev 
+                  onClick={() => paginate(Math.max(1, currentPage - 1))} 
+                  disabled={currentPage === 1}
+                />
+                {renderPaginationItems()}
+                <Pagination.Next 
+                  onClick={() => paginate(Math.min(totalPages, currentPage + 1))} 
+                  disabled={currentPage === totalPages}
+                />
+              </Pagination>
+            </div>
+          )}
         </div>
       </section>
 
@@ -474,6 +613,50 @@ export default function Cars() {
                 />
               </div>
               
+              <div className="flex items-center space-x-2">
+                <input 
+                  type="checkbox" 
+                  required 
+                  id="terms"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)} 
+                />
+                <label htmlFor="terms">
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowTerms(true);
+                    }}
+                    className="text-blue-600 underline"
+                  >
+                    I accept the terms
+                  </a>
+                </label>
+              </div>
+
+              {showTerms && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white p-6 rounded-xl max-w-lg shadow-xl">
+                    <h2 className="text-xl font-bold mb-4">Car Rental Terms</h2>
+                    <ul className="list-disc pl-6 space-y-2 text-sm text-gray-700">
+                      <li>The renter must be at least 21 years old.</li>
+                      <li>A valid driver's license is required.</li>
+                      <li>Late returns will incur additional fees.</li>
+                      <li>Damage to the car will be the renter's responsibility.</li>
+                    </ul>
+                    <div className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                      <button
+                        onClick={() => setShowTerms(false)}
+                        className="px-4 py-2 bg-blue-600 text-dark rounded-lg"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               {startDate && endDate && selectedCar && (
                 <div className="mt-3 p-3 bg-light rounded">
                   <p className="mb-1"><strong>Booking Summary:</strong></p>
@@ -483,7 +666,7 @@ export default function Cars() {
                     Duration: {Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24))} days
                   </p>
                   <p className="mb-0 font-weight-bold">
-                    Total Price: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * selectedCar.price_per_day}
+                    Total Price: JD{Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * selectedCar.price_per_day}
                   </p>
                 </div>
               )}
@@ -531,7 +714,7 @@ export default function Cars() {
                   <Form.Check
                     inline
                     type="radio"
-                    label="Cash on Delivery (+$5 fee)"
+                    label="Cash on Delivery (+JD 5 fee)"
                     name="paymentType"
                     value="cash"
                     checked={paymentType === 'cash'}
@@ -604,22 +787,9 @@ export default function Cars() {
               {paymentType === 'cash' && (
                 <>
                   <div className="alert alert-info">
-                    <p className="mb-0">Pay a $20 deposit now to secure your booking. 
-                    The remaining amount will be collected at pickup. A $5 processing fee applies to cash payments.</p>
+                    <p className="mb-0">Pay a JD 20 deposit now to secure your booking. 
+                    The remaining amount will be collected at pickup. A JD 5 processing fee applies to cash payments.</p>
                   </div>
-                  
-                  {/* Add deposit payment options for cash payment */}
-                  {/* <Form.Group className="mt-3">
-                    <Form.Label>Deposit Payment Method</Form.Label>
-                    <Form.Control 
-                      as="select" 
-                      className="form-control"
-                    >
-                      <option>Credit Card</option>
-                      <option>Debit Card</option>
-                      <option>PayPal</option>
-                    </Form.Control>
-                  </Form.Group> */}
                   
                   <Form.Group>
                     <Form.Label>Card Number</Form.Label>
@@ -680,27 +850,27 @@ export default function Cars() {
               )}
             </Form>
             
-            {startDate && endDate && selectedCar && paymentSummary && (
+            {paymentSummary && (
               <div className="payment-summary mt-4 p-3 bg-light rounded">
                 <h6 className="mb-3">Payment Summary</h6>
-                <p className="mb-1">Vehicle: {selectedCar.name}</p>
+                <p className="mb-1">Vehicle: {selectedCar?.name}</p>
                 <p className="mb-1">Duration: {paymentSummary.days} days</p>
-                <p className="mb-1">Start Date: {startDate.toISOString().split('T')[0]}</p>
-                <p className="mb-1">End Date: {endDate.toISOString().split('T')[0]}</p>
-                <p className="mb-1">Base Price: ${paymentSummary.basePrice}</p>
+                {startDate && <p className="mb-1">Start Date: {startDate.toISOString().split('T')[0]}</p>}
+                {endDate && <p className="mb-1">End Date: {endDate.toISOString().split('T')[0]}</p>}
+                <p className="mb-1">Base Price: JD{paymentSummary.basePrice}</p>
                 
                 {paymentType === 'cash' && (
                   <>
-                    <p className="mb-1">Cash Processing Fee: +$5</p>
-                    <p className="mb-1">Total Amount: ${paymentSummary.totalPrice}</p>
-                    <p className="mb-1 font-weight-bold">Due Now (Deposit): $20</p>
-                    <p className="mb-0">Due at Pickup: ${paymentSummary.totalPrice - 20}</p>
+                    <p className="mb-1">Cash Processing Fee: +JD{paymentSummary.additionalFee}</p>
+                    <p className="mb-1">Total Amount: JD{paymentSummary.totalPrice}</p>
+                    <p className="mb-1 font-weight-bold">Due Now (Deposit): JD{paymentSummary.deposit}</p>
+                    <p className="mb-0">Due at Pickup: JD{paymentSummary.totalPrice - paymentSummary.deposit}</p>
                   </>
                 )}
                 
                 {paymentType === 'card' && (
                   <p className="mb-0 font-weight-bold">
-                    Total Amount Due Now: ${paymentSummary.totalPrice}
+                    Total Amount Due Now: JD{paymentSummary.totalPrice}
                   </p>
                 )}
               </div>
@@ -724,7 +894,7 @@ export default function Cars() {
                 Processing...
               </>
             ) : (
-              paymentType === 'cash' ? 'Pay $20 Deposit' : 'Complete Payment'
+              paymentType === 'cash' ? 'Pay JD 20 Deposit' : 'Complete Payment'
             )}
           </Button>
         </Modal.Footer>

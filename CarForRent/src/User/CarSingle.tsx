@@ -83,6 +83,9 @@ const getImage = (car: Car & { images?: { image_path: string }[] }) => {
 };
 
 export default function CarSingle() {
+
+   const [showTerms, setShowTerms] = useState(false);
+    const [termsAccepted, setTermsAccepted] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -147,8 +150,13 @@ export default function CarSingle() {
     
     return false;
   };
-
+  
   const handleProceedToPayment = () => {
+    if (!termsAccepted) {
+      alert("You must accept the terms and conditions to proceed.");
+      return;
+    }
+  
     if (!startDate || !endDate || !car) {
       alert("Please select a start and end date.");
       return;
@@ -296,6 +304,7 @@ export default function CarSingle() {
       setReviews(response.data);
     } catch (error) {
       console.error('Error fetching reviews:', error);
+      alert('Failed to fetch reviews. Please try again later.');
     }
   };
 
@@ -478,7 +487,7 @@ export default function CarSingle() {
                       </button>
                     </>
                   ) : (
-                    <div
+                    <div                 
                       className="img rounded"
                       style={{
                         width: '100%',
@@ -487,19 +496,113 @@ export default function CarSingle() {
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                       }}
-                    ></div>
+                    >
+                      
+                    </div>
                   )}
                 </div>
+                <div className="row">
+   <div className="col-md d-flex align-self-stretch ftco-animate">
+     <div className="media block-6 services">
+       <div className="media-body py-md-4">
+         <div className="d-flex mb-3 align-items-center">
+           <div className="icon d-flex align-items-center justify-content-center">
+             <i className="fas fa-palette"></i>
+           </div>
+           <div className="text">
+             <h3 className="heading mb-0 pl-3">
+               Color
+               <span> {car.color}</span>
+             </h3>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+ 
+   <div className="col-md d-flex align-self-stretch ftco-animate">
+     <div className="media block-6 services">
+       <div className="media-body py-md-4">
+         <div className="d-flex mb-3 align-items-center">
+           <div className="icon d-flex align-items-center justify-content-center">
+             <i className="fas fa-cogs"></i>
+           </div>
+           <div className="text">
+             <h3 className="heading mb-0 pl-3">
+               Transmission
+               <span> {car.transmission}</span>
+             </h3>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+ 
+   <div className="col-md d-flex align-self-stretch ftco-animate">
+     <div className="media block-6 services">
+       <div className="media-body py-md-4">
+         <div className="d-flex mb-3 align-items-center">
+           <div className="icon d-flex align-items-center justify-content-center">
+             <i className="fas fa-chair"></i>
+           </div>
+           <div className="text">
+             <h3 className="heading mb-0 pl-3">
+               Seats
+               <span> {car.seats} Adults</span>
+             </h3>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+{/*  
+   <div className="col-md d-flex align-self-stretch ftco-animate">
+     <div className="media block-6 services">
+       <div className="media-body py-md-4">
+         <div className="d-flex mb-3 align-items-center">
+           <div className="icon d-flex align-items-center justify-content-center">
+             <i className="fas fa-circle"></i>
+           </div>
+           <div className="text">
+             <h3 className="heading mb-0 pl-3">
+               Status
+               <span> {car.status}</span>
+             </h3>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div> */}
+ 
+   <div className="col-md d-flex align-self-stretch ftco-animate">
+     <div className="media block-6 services">
+       <div className="media-body py-md-4">
+         <div className="d-flex mb-3 align-items-center">
+           <div className="icon d-flex align-items-center justify-content-center">
+             <i className="fas fa-gas-pump"></i>
+           </div>
+           <div className="text">
+             <h3 className="heading mb-0 pl-3">
+               Fuel
+               <span> {car.fuel_type}</span>
+             </h3>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
                 <div className="text text-center">
                   <span className="subheading">{car.car_type}</span>
                   <h2>{car.name}</h2>
                   {car.lessor && (
                     <div className="lessor-info mb-3">
-                      <p className="mb-0">Rented by: <strong>{car.lessor.name}</strong></p>
+                      <p className="mb-0">Rented by:<a href={`/Carlessors/${car.lessor.id}`}>{car.lessor.name}</a>
+                      </p>
                     </div>
                   )}
                   <p className="price">
-                    <span>${car.price_per_day}</span> / day
+                    <span>JD{car.price_per_day}</span> / day
                     <a onClick={() => setShowModal(true)} className="btn btn-primary py-2 mr-1" role="button">Book Now</a>
                   </p>
                 </div>
@@ -686,11 +789,11 @@ export default function CarSingle() {
                         <div className="d-flex mb-3">
                           <span className="cat text-muted">{relatedCar.car_type}</span>
                           <p className="price ml-auto mb-0">
-                            ${relatedCar.price_per_day} <span>/day</span>
+                            JD{relatedCar.price_per_day} <span>/day</span>
                           </p>
                         </div>
                         <div className="d-flex">
-                          <a href={`car-single/${car.id}`} className="btn btn-secondary py-2 ml-1">Details</a>
+                          <a href={`/car-single/${car.id}`} className="btn btn-secondary py-2 ml-1">Details</a>
                         </div>
                       </div>
                     </div>
@@ -741,6 +844,49 @@ export default function CarSingle() {
               dayClassName={highlightWithRed}
             />
           </div>
+          <div className="flex items-center space-x-2">
+        <input type="checkbox" required id="terms"
+        checked={termsAccepted}
+        onChange={(e) => setTermsAccepted(e.target.checked)} />
+        <label htmlFor="terms">
+          <a
+            href="#"
+            
+            onClick={(e) => {
+              e.preventDefault();
+              setShowTerms(true);
+            }}
+            className="text-blue-600 underline"
+          >
+            I accept the terms
+          </a>
+        </label>
+      </div>
+
+      {showTerms && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl max-w-lg shadow-xl">
+            <h2 className="text-xl font-bold mb-4">Car Rental Terms</h2>
+            <ul className="list-disc pl-6 space-y-2 text-sm text-gray-700">
+              <li>The renter must be at least 21 years old.</li>
+              <li>A valid driver's license is required.</li>
+              {/* <li>Insurance is mandatory for all rentals.</li> */}
+              <li>Late returns will incur additional fees.</li>
+              {/* <li>Fuel policy: return with a full tank.</li> */}
+              {/* <li>No smoking allowed in the vehicle.</li> */}
+              <li>Damage to the car will be the renter's responsibility.</li>
+            </ul>
+            <div className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              <button
+                onClick={() => setShowTerms(false)}
+                className="px-4 py-2 bg-blue-600 text-dark rounded-lg"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>)}
           
           {startDate && endDate && (
             <div className="mt-3 p-3 bg-light rounded">
@@ -751,7 +897,7 @@ export default function CarSingle() {
                 Duration: {Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24))} days
               </p>
               <p className="mb-0 font-weight-bold">
-                Total Price: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day}
+                Total Price: JD{Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day}
               </p>
             </div>
           )}
@@ -798,7 +944,7 @@ export default function CarSingle() {
                   <Form.Check
                     inline
                     type="radio"
-                    label="Cash on Delivery (+$5 fee)"
+                    label="Cash on Delivery (+JD5 fee)"
                     name="paymentType"
                     value="cash"
                     checked={paymentInfo.paymentType === 'cash'}
@@ -872,7 +1018,7 @@ export default function CarSingle() {
                 <>
                   <div className="alert alert-info">
                     <p className="mb-0">
-                      Pay a $20 deposit now to secure your booking. The remaining amount will be collected at pickup. A $5 processing fee applies to cash payments.
+                      Pay a JD20 deposit now to secure your booking. The remaining amount will be collected at pickup. A JD5 processing fee applies to cash payments.
                     </p>
                   </div>
                   <Form.Group>
@@ -940,14 +1086,14 @@ export default function CarSingle() {
                   <p className="mb-1">Duration: {Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24))} days</p>
                   <p className="mb-1">Start Date: {startDate.toISOString().split('T')[0]}</p>
                   <p className="mb-1">End Date: {endDate.toISOString().split('T')[0]}</p>
-                  <p className="mb-1">Base Price: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day}</p>
+                  <p className="mb-1">Base Price: JD{Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day}</p>
                   {paymentInfo.paymentType === 'cash' && (
                     <>
-                      <p className="mb-1">Cash Processing Fee: +$5</p>
-                      <p className="mb-1">Total Amount: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day + 5}</p>
+                      <p className="mb-1">Cash Processing Fee: +JD5</p>
+                      <p className="mb-1">Total Amount: JD{Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day + 5}</p>
                       <hr />
-                      <p className="mb-1 font-weight-bold">Due Now (Deposit): $20</p>
-                      <p className="mb-0 font-weight-bold">Due at Pickup: ${Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day + 5 - 20}</p>
+                      <p className="mb-1 font-weight-bold">Due Now (Deposit): JD20</p>
+                      <p className="mb-0 font-weight-bold">Due at Pickup: JD{Math.ceil((+endDate - +startDate) / (1000 * 60 * 60 * 24)) * car.price_per_day + 5 - 20}</p>
                     </>
                   )}
                 </div>
@@ -981,3 +1127,5 @@ export default function CarSingle() {
     </>
   );
 }
+
+

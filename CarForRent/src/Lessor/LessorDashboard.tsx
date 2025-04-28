@@ -87,14 +87,14 @@ const LessorDashboard: React.FC = () => {
     },
     {
       title: 'Total Income',
-      value: `$${totalIncome.toFixed(2)}`,
+      value: `JD${totalIncome.toFixed(2)}`,
       icon: <BiMoney size={28} className="text-white" />,
       bg: 'linear-gradient(to right, #f46b45, #eea849)',
       textColor: 'white'
     },
     {
       title: 'Profit (After 10%)',
-      value: `$${profit.toFixed(2)}`,
+      value: `JD${profit.toFixed(2)}`,
       icon: <BiMoney size={28} className="text-white" />,
       bg: 'linear-gradient(to right, #5c258d, #4389a2)',
       textColor: 'white'

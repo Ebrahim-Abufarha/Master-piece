@@ -162,6 +162,12 @@ export default function Register() {
         if (!formData.password) {
             newErrors.password = 'Password is required';
             valid = false;
+        } else {
+            const passwordRegex = /^(?=.*[A-Z])(?=.*[@*#]).{8,}$/;
+            if (!passwordRegex.test(formData.password)) {
+                newErrors.password = "Password must be at least 8 characters, include one uppercase letter and one symbol (@, *, #).";
+                valid = false;
+            }
         }
 
         if (formData.password !== formData.confirmPassword) {
@@ -171,8 +177,14 @@ export default function Register() {
 
         if (!formData.phoneNumber) {
             newErrors.phoneNumber = 'Phone number is required';
-            valid = false;
-        }
+            valid = false; }
+            if (formData.phoneNumber.length < 10) {
+                newErrors.phoneNumber = 'Phone number must be at least 10 digits';
+                valid = false;
+            }
+            
+            
+       
 
         if (!formData.address) {
             newErrors.address = 'Address is required';
@@ -239,7 +251,7 @@ export default function Register() {
                             value={formData.username}
                             onChange={handleInputChange}
                         />
-                        {errors.username && <span className="error">{errors.username}</span>}
+                        {errors.username && <span style={{ textAlign:"center" }} className="error">{errors.username}</span>}
                         <input 
                             type="email" 
                             name="email" 
@@ -247,7 +259,7 @@ export default function Register() {
                             value={formData.email}
                             onChange={handleInputChange}
                         />
-                        {errors.email && <span className="error">{errors.email}</span>}
+                        {errors.email && <span style={{ textAlign:"center" }} className="error">{errors.email}</span>}
                         <input 
                             type="password" 
                             name="password" 
@@ -255,7 +267,7 @@ export default function Register() {
                             value={formData.password}
                             onChange={handleInputChange}
                         />
-                        {errors.password && <span className="error">{errors.password}</span>}
+                        {errors.password && <span style={{ textAlign:"center" }} className="error">{errors.password}</span>}
                         <input 
                             type="password" 
                             name="confirmPassword" 
@@ -263,7 +275,7 @@ export default function Register() {
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
                         />
-                        {errors.confirmPassword && <span className="error">{errors.confirmPassword}</span>}
+                        {errors.confirmPassword && <span style={{ textAlign:"center" }} className="error">{errors.confirmPassword}</span>}
                         <input 
                             type="text" 
                             name="phoneNumber" 
@@ -271,7 +283,7 @@ export default function Register() {
                             value={formData.phoneNumber}
                             onChange={handleInputChange}
                         />
-                        {errors.phoneNumber && <span className="error">{errors.phoneNumber}</span>}
+                        {errors.phoneNumber && <span style={{ textAlign:"center" }} className="error">{errors.phoneNumber}</span>}
                         <input 
                             type="text" 
                             name="address" 
@@ -279,7 +291,7 @@ export default function Register() {
                             value={formData.address}
                             onChange={handleInputChange}
                         />
-                        {errors.address && <span className="error">{errors.address}</span>}
+                        {errors.address && <span style={{ textAlign:"center" }} className="error">{errors.address}</span>}
                         <div className="checkbox-container">
                         <label style={{ fontSize:"20px",marginTop:"-10px" }} htmlFor="isLessor">Are you lessor?</label>
 
@@ -299,9 +311,9 @@ export default function Register() {
                             onChange={handleFileChange}
                             accept="image/*"
                         />
-                        {errors.profileImage && <span className="error">{errors.profileImage}</span>}
+                        {errors.profileImage && <span style={{ textAlign:"center" }} className="error">{errors.profileImage}</span>}
                         <button type="submit">Sign up</button>
-                        {error && <span className="error">{error}</span>}
+                        {error && <span style={{ textAlign:"center" }} className="error">{error}</span>}
                     </form>
                 </div>
 
@@ -315,7 +327,7 @@ export default function Register() {
                             value={loginData.email}
                             onChange={handleLoginInputChange}
                         />
-                        {loginErrors.email && <span className="error">{loginErrors.email}</span>}
+                        {loginErrors.email && <span style={{ textAlign:"center" }} className="error">{loginErrors.email}</span>}
                         <input 
                             type="password" 
                             name="password" 
@@ -323,7 +335,7 @@ export default function Register() {
                             value={loginData.password}
                             onChange={handleLoginInputChange}
                         />
-                        {loginErrors.password && <span className="error">{loginErrors.password}</span>}
+                        {loginErrors.password && <span style={{ textAlign:"center" }} className="error">{loginErrors.password}</span>}
                         <button type="submit">Login</button>
                         <p 
                             onClick={toggleForm} 

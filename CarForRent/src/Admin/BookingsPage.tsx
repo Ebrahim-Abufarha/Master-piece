@@ -127,7 +127,7 @@ const AdminBookingsPage: React.FC = () => {
                         {new Date(booking.start_date).toLocaleDateString('en-US')} - 
                         {new Date(booking.end_date).toLocaleDateString('en-US')}
                       </td>
-                      <td>${Number(booking.total).toFixed(2)}</td>
+                      <td>JD{Number(booking.total).toFixed(2)}</td>
                       <td>
   <span
     className={`badge ${

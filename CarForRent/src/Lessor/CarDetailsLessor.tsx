@@ -142,7 +142,7 @@ const LessorCarDetailsPage: React.FC = () => {
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Price per day:</span>
-                  <span className="detail-value">${car.price_per_day}</span>
+                  <span className="detail-value">JD{car.price_per_day}</span>
                 </div>
                 {car.status && (
                   <div className="detail-item">

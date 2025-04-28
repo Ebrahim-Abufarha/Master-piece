@@ -268,7 +268,7 @@ const AddCarPage: React.FC = () => {
       formDataToSend.append('transmission', formData.transmission);
       formDataToSend.append('fuel_type', formData.fuel_type);
       
-      formDataToSend.append('add', formData.add ? '20.00' : '0.00');
+      formDataToSend.append('add', formData.add ? '20.00' : '');
       
       if (formData.add) {
         formDataToSend.append('ad_fee', '20');
@@ -351,7 +351,7 @@ const AddCarPage: React.FC = () => {
               <Row className="mb-3">
                 <Col md={4}>
                   <Form.Group controlId="price_per_day">
-                    <Form.Label>Price per Day ($)</Form.Label>
+                    <Form.Label>Price per Day (JD)</Form.Label>
                     <Form.Control
                       type="number"
                       name="price_per_day"
@@ -447,7 +447,7 @@ const AddCarPage: React.FC = () => {
                 <Form.Check
                   type="checkbox"
                   name="add"
-                  label="Add advertisement for this car ($20/month)"
+                  label="Add advertisement for this car (JD20/month)"
                   checked={formData.add}
                   onChange={handleCheckboxChange}
                 />
@@ -521,7 +521,7 @@ const AddCarPage: React.FC = () => {
         </Modal.Header>
         <Modal.Body>
           <p>You are about to add an advertisement for this car listing.</p>
-          <p>This will cost <strong>$20 per month</strong> and will be charged with your registration.</p>
+          <p>This will cost <strong>JD 20 per month</strong> and will be charged with your registration.</p>
           <p>Would you like to continue to payment?</p>
         </Modal.Body>
         <Modal.Footer>
@@ -559,12 +559,12 @@ const AddCarPage: React.FC = () => {
                 <h5 className="text-primary">Advertisement Fee</h5>
                 <div className="d-flex justify-content-between align-items-center">
                   <span>Monthly Advertisement</span>
-                  <span className="fw-bold">$20.00</span>
+                  <span className="fw-bold">JD 20.00</span>
                 </div>
                 <hr />
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="fw-bold">Total</span>
-                  <span className="fw-bold text-primary fs-5">$20.00</span>
+                  <span className="fw-bold text-primary fs-5">JD 20.00</span>
                 </div>
               </div>
               
@@ -708,7 +708,7 @@ const AddCarPage: React.FC = () => {
                   Processing...
                 </>
               ) : (
-                <>Pay $20.00</>
+                <>Pay JD 20.00</>
               )}
             </Button>
           </Modal.Footer>
