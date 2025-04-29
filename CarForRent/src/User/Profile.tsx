@@ -57,6 +57,34 @@ export default function UserProfile() {
     fetchData();
   }, [id]);
 
+  const isBookingEnded = (endDate: string) => {
+    return new Date(endDate) < new Date();
+  };
+
+  const canDeleteBooking = (startDate: string) => {
+    const start = new Date(startDate);
+    const now = new Date();
+    const diffTime = start.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 3;
+  };
+
+  const deleteBooking = async (bookingId: number) => {
+    try {
+      const response = await axios.delete(`http://localhost:8000/api/users/bookings/${bookingId}`);
+      if (response.data.success) {
+        setBookings(bookings.filter(booking => booking.id !== bookingId));
+      }
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data?.message || 'Failed to delete booking');
+      } else {
+        alert('An unexpected error occurred');
+      }
+    }
+  };
+
   if (loading) return <div className="text-center py-5">Loading...</div>;
   if (!user) return <div className="text-center py-5">User not found</div>;
 
@@ -71,136 +99,155 @@ export default function UserProfile() {
   };
 
   return (
-  
-  <>
-  <div className="profile-section">
-  <div className="container">
-    <h1 className="display-4 fw-bold">My Profile</h1>
-    <p className="lead">Manage your account and view booking history</p>
-  </div>
-</div>
-
-<div className="container mb-5">
-  {/* Profile Card */}
-  <div className="profile-content mb-5">
-    <div className="row g-0">
-      <div className="col-md-4 profile-img-container">
-        <img
-          src={`http://localhost:8000/storage/${user.image}`}
-          className="profile-img rounded-circle"
-          alt={user.name}
-        />
-      </div>
-      <div className="col-md-8 profile-info">
-        <h2 className="profile-title">{user.name}</h2>
-        <div className="profile-detail">
-          <i className="bi bi-envelope"></i> {user.email}
-        </div>
-        {user.phone && (
-          <div className="profile-detail">
-            <i className="bi bi-telephone"></i> {user.phone}
-          </div>
-        )}
-        {user.address && (
-          <div className="profile-detail">
-            <i className="bi bi-geo-alt"></i> {user.address}
-          </div>
-        )}
-        <Link to={`/users/${user.id}/edit`} className="btn edit-btn">
-          <i className="bi bi-pencil-square me-2"></i> Edit Profile
-        </Link>
-      </div>
-    </div>
-  </div>
-
-  {/* Booking History */}
-  <h3 className="section-title">
-    <i className="bi bi-calendar-check me-2"></i> Booking History
-  </h3>
-  
-  {bookings.length > 0 ? (
     <>
-      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {paginatedBookings.map((booking) => (
-          <div key={booking.id} className="col">
-            <div className="card booking-card">
-              <div className="booking-header">
-                <i className="bi bi-calendar-event me-2"></i>
-                Booking #{booking.id}
+    <div className="hello">
+      <div className="profile-section">
+        <div className="container">
+          <h1 className="display-4 fw-bold">My Profile</h1>
+          <p className="lead">Manage your account and view booking history</p>
+        </div>
+      </div>
+
+      <div className="container mb-5">
+        {/* Profile Card */}
+        <div className="profile-content mb-5">
+          <div className="row g-0">
+            <div className="col-md-4 profile-img-container">
+              <img
+                src={`http://localhost:8000/storage/${user.image}`}
+                className="profile-img rounded-circle"
+                alt={user.name}
+              />
+            </div>
+            <div className="col-md-8 profile-info">
+              <h2 className="profile-title">{user.name}</h2>
+              <div className="profile-detail">
+                <i className="bi bi-envelope"></i> {user.email}
               </div>
-              <div className="booking-body">
-                {booking.car && (
-                  <>
-                    <h5 className="car-title">
-                      <i className="bi bi-car-front me-2"></i>
-                      <a href={`/car-single/${booking.car.id}`}>{booking.car.name}</a>
-                    </h5>
-                    <div className="booking-detail">
-                      <i className="bi bi-calendar"></i>
-                      <strong>From:</strong> {new Date(booking.start_date).toLocaleDateString()}
-                    </div>
-                    <div className="booking-detail">
-                      <i className="bi bi-calendar-check"></i>
-                      <strong>To:</strong> {new Date(booking.end_date).toLocaleDateString()}
-                    </div>
-                    <div className="booking-price">
-                      <i className="bi bi-currency me-2"></i>
-                      Total: jd {booking.total}
-                    </div>
-                  </>
-                )}
-              </div>
+              {user.phone && (
+                <div className="profile-detail">
+                  <i className="bi bi-telephone"></i> {user.phone}
+                </div>
+              )}
+              {user.address && (
+                <div className="profile-detail">
+                  <i className="bi bi-geo-alt"></i> {user.address}
+                </div>
+              )}
+              <Link to={`/users/${user.id}/edit`} className="btn edit-btn">
+                <i className="bi bi-pencil-square me-2"></i> Edit Profile
+              </Link>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <nav className="mt-5">
-          <ul className="pagination justify-content-center">
-            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-              <button 
-                className="page-link" 
-                onClick={() => handlePageChange(currentPage - 1)}
-                aria-label="Previous"
-              >
-                <span aria-hidden="true">&laquo;</span>
-              </button>
-            </li>
-            
-            {Array.from({ length: totalPages }, (_, i) => (
-              <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                <button className="page-link" onClick={() => handlePageChange(i + 1)}>
-                  {i + 1}
-                </button>
-              </li>
-            ))}
-            
-            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-              <button 
-                className="page-link" 
-                onClick={() => handlePageChange(currentPage + 1)}
-                aria-label="Next"
-              >
-                <span aria-hidden="true">&raquo;</span>
-              </button>
-            </li>
-          </ul>
-        </nav>
-      )}
+        {/* Booking History */}
+        <h3 className="section-title">
+          <i className="bi bi-calendar-check me-2"></i> Booking History
+        </h3>
+        
+        {bookings.length > 0 ? (
+          <>
+            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+              {paginatedBookings.map((booking) => (
+                <div key={booking.id} className="col">
+                  <div className={`card booking-card ${isBookingEnded(booking.end_date) ? 'ended-booking' : ''}`}>
+                    {isBookingEnded(booking.end_date) && (
+                      <div className="ended-badge">
+                        <i className="bi bi-check-circle me-1"></i> Ended
+                      </div>
+                    )}
+                    <div className="booking-header">
+                      <i className="bi bi-calendar-event me-2"></i>
+                      Booking #{booking.id}
+                    </div>
+                    <div className="booking-body">
+                      {booking.car && (
+                        <>
+                          <h5 className="car-title">
+                            <i className="bi bi-car-front me-2"></i>
+                            <a href={`/car-single/${booking.car.id}`}>{booking.car.name}</a>
+                          </h5>
+                          <div className="booking-detail">
+                            <i className="bi bi-calendar"></i>
+                            <strong>From:</strong> {new Date(booking.start_date).toLocaleDateString()}
+                          </div>
+                          <div className="booking-detail">
+                            <i className="bi bi-calendar-check"></i>
+                            <strong>To:</strong> {new Date(booking.end_date).toLocaleDateString()}
+                          </div>
+                          <div className="booking-price">
+                            <i className="bi bi-currency me-2"></i>
+                            Total: jd {booking.total}
+                          </div>
+                          
+                          {canDeleteBooking(booking.start_date) && (
+                            <button 
+                              className="btn btn-danger btn-sm mt-2"
+                              onClick={() => {
+                                if (window.confirm('Are you sure you want to delete this booking?')) {
+                                  deleteBooking(booking.id);
+                                }
+                              }}
+                            >
+                              <i className="bi bi-trash me-1"></i> Delete Booking
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <nav className="mt-5">
+                <ul className="pagination justify-content-center">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      aria-label="Previous"
+                    >
+                      <span aria-hidden="true">&laquo;</span>
+                    </button>
+                  </li>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => handlePageChange(i + 1)}>
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      aria-label="Next"
+                    >
+                      <span aria-hidden="true">&raquo;</span>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-5">
+            <i className="bi bi-calendar-x" style={{ fontSize: '3rem', color: '#01d28e' }}></i>
+            <h4 className="mt-3">No bookings yet</h4>
+            <p className="text-muted">You haven't made any bookings yet. Start exploring our cars!</p>
+            <Link to="/cars" className="btn edit-btn mt-3">
+              <i className="bi bi-search me-2"></i> Browse Cars
+            </Link>
+          </div>
+        )}
+      </div>
+      </div>
     </>
-  ) : (
-    <div className="text-center py-5">
-      <i className="bi bi-calendar-x" style={{ fontSize: '3rem', color: '#01d28e' }}></i>
-      <h4 className="mt-3">No bookings yet</h4>
-      <p className="text-muted">You haven't made any bookings yet. Start exploring our cars!</p>
-      <Link to="/cars" className="btn edit-btn mt-3">
-        <i className="bi bi-search me-2"></i> Browse Cars
-      </Link>
-    </div>
-  )}
-</div>
-  </>
   );
 }

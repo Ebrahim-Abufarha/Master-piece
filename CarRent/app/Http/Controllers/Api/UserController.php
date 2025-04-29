@@ -74,6 +74,37 @@ class UserController extends Controller
             ], 500);
         }
     }
+    public function destroyBooking($id)
+{
+    try {
+        $booking = Booking::findOrFail($id);
+
+        // التحقق من أن هناك أكثر من 3 أيام متبقية لبداية الحجز
+        $startDate = new \DateTime($booking->start_date);
+        $currentDate = new \DateTime();
+        $diff = $currentDate->diff($startDate);
+
+        if ($diff->days <= 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete booking less than 3 days before start date'
+            ], 400);
+        }
+
+        $booking->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Booking deleted successfully'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error deleting booking: ' . $e->getMessage()
+        ], 500);
+    }
+}
     public function update(Request $request, $id)
     {
         try {
@@ -87,7 +118,7 @@ class UserController extends Controller
 
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 $file = $request->file('image');
-                $path = $file->store('profile_images', 'public'); 
+                $path = $file->store('profile_images', 'public');
                 $data['image'] = $path;
             }
 

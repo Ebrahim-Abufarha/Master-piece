@@ -10148,3 +10148,66 @@ textarea.form-control {
       background-color: #dc3545;
       color: white;
     }
+    /* Booking card styles */
+.hello .booking-card {
+  position: relative;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.hello .booking-card.ended-booking {
+  opacity: 0.85;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.hello .ended-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #6c757d;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Delete button styles */
+.hello .btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.hello .btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Profile section styles */
+.hello .profile-section {
+  background-color: #f8f9fa;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.hello .profile-img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+}
+
+.hello .edit-btn {
+  background-color: #01d28e;
+  color: white;
+  margin-top: 1rem;
+}
+
+.hello .edit-btn:hover {
+  background-color: #01a775;
+  color: white;
+}

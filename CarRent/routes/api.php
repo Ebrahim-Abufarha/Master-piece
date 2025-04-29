@@ -62,7 +62,7 @@ Route::group(['prefix' => 'users'], function() {
     Route::get('/{id}/bookings', [UserController::class, 'bookings']);
     Route::put('/{id}', [UserController::class, 'update']);
 Route::post('/{id}', [UserController::class, 'update']);
-
+Route::delete('/bookings/{id}', [UserController::class, 'destroyBooking']);
 });
 
     Route::get('/favorites/{id}', [FavoriteController::class, 'index']);
