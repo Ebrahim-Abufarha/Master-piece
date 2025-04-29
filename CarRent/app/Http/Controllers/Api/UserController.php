@@ -79,7 +79,6 @@ class UserController extends Controller
     try {
         $booking = Booking::findOrFail($id);
 
-        // التحقق من أن هناك أكثر من 3 أيام متبقية لبداية الحجز
         $startDate = new \DateTime($booking->start_date);
         $currentDate = new \DateTime();
         $diff = $currentDate->diff($startDate);
