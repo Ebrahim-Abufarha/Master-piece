@@ -144,7 +144,7 @@ export default function UserProfile() {
                       <strong>To:</strong> {new Date(booking.end_date).toLocaleDateString()}
                     </div>
                     <div className="booking-price">
-                      <i className="bi bi-currency-dollar me-2"></i>
+                      <i className="bi bi-currency me-2"></i>
                       Total: jd {booking.total}
                     </div>
                   </>

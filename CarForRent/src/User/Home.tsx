@@ -57,7 +57,7 @@ const CarCard = ({ car }: CarCardProps) => {
             <div><span className="meta-chat"><span className="icon-chat"></span> {car.seats} Seats</span></div>
           </div>
           <h3 className="heading mt-2"><a href={`car-single/${car.id}`}>{car.name}</a></h3>
-          <p className="car-price">${car.price_per_day} <span>/day</span></p>
+          <p className="car-price">JD{car.price_per_day} <span>/day</span></p>
           {car.add && <p className="ad-badge">Promoted</p>}
           <p>
             <a href={`car-single/${car.id}`} className="btn btn-secondary py-2 ml-1">Details</a>

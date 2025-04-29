@@ -150,7 +150,7 @@ export default function LessorProfile() {
                   <span className="badge bg-secondary ms-2">{car.status}</span>
                 </p>
                 <p className="card-text mt-auto">
-                  <strong>${car.price_per_day}</strong> per day
+                  <strong>JD{car.price_per_day}</strong> per day
                 </p>
                 <div className="card-footer bg-transparent border-0 px-0 pb-0">
                   <a href={`/car-single/${car.id}`} className="btn btn-secondary w-100">

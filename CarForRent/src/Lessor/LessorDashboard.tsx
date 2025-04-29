@@ -203,7 +203,7 @@ const LessorDashboard: React.FC = () => {
                     <YAxis stroke="#666" />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="income" stroke="#8884d8" name="Income ($)" />
+                    <Line type="monotone" dataKey="income" stroke="#8884d8" name="Income (JD)" />
                     <Line type="monotone" dataKey="bookings" stroke="#82ca9d" name="Bookings" />
                   </LineChart>
                 </ResponsiveContainer>
@@ -270,7 +270,7 @@ const LessorDashboard: React.FC = () => {
                             {new Date(booking.start_date).toLocaleDateString()} - 
                             {new Date(booking.end_date).toLocaleDateString()}
                           </td>
-                          <td>${parseToNumber(booking.total).toFixed(2)}</td>
+                          <td>JD{parseToNumber(booking.total).toFixed(2)}</td>
                           <td>
                             <span className={`badge ${
                               booking.status === 'confirmed' ? 'bg-success' :

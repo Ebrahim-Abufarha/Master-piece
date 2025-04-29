@@ -24,9 +24,15 @@ interface Booking {
 
 const LessorBookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const lessorId = localStorage.getItem("user_id");
+  
+  // Filter and search states
+  const [statusFilter, setStatusFilter] = useState<'all' | Booking['status']>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -38,13 +44,24 @@ const LessorBookingsPage: React.FC = () => {
         const response = await axios.get(`http://localhost:8000/api/lessor/bookings/${lessorId}`);
         console.log('API Response:', response.data);
         
+        let fetchedBookings: Booking[] = [];
         if (response.data.bookings) {
-          setBookings(response.data.bookings);
+          fetchedBookings = response.data.bookings;
         } else if (Array.isArray(response.data)) {
-          setBookings(response.data);
+          fetchedBookings = response.data;
         } else {
           setError('Unexpected response structure');
         }
+        
+        // Sort bookings by date (newest first by default)
+        const sortedBookings = fetchedBookings.sort((a, b) => {
+          const dateA = new Date(a.start_date).getTime();
+          const dateB = new Date(b.start_date).getTime();
+          return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+        });
+        
+        setBookings(sortedBookings);
+        setFilteredBookings(sortedBookings);
           
       } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -55,7 +72,36 @@ const LessorBookingsPage: React.FC = () => {
     };
 
     fetchBookings();
-  }, [lessorId]);
+  }, [lessorId, sortOrder]);
+
+  // Apply filters and search whenever they change
+  useEffect(() => {
+    let result = [...bookings];
+    
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      result = result.filter(booking => booking.status === statusFilter);
+    }
+    
+    // Apply search
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(booking => 
+        booking.user.name.toLowerCase().includes(term) || 
+        booking.car.name.toLowerCase().includes(term)
+      );
+    }
+    
+    // Apply sorting
+    result = result.sort((a, b) => {
+      const dateA = new Date(a.start_date).getTime();
+      const dateB = new Date(b.start_date).getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+    
+    setFilteredBookings(result);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [bookings, statusFilter, searchTerm, sortOrder]);
 
   const handleStatusChange = async (id: number, newStatus: Booking['status']) => {
     try {
@@ -95,10 +141,10 @@ const LessorBookingsPage: React.FC = () => {
   // Get current bookings
   const indexOfLastBooking = currentPage * bookingsPerPage;
   const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
-  const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
+  const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
 
   // Calculate total number of pages
-  const totalPages = Math.ceil(bookings.length / bookingsPerPage);
+  const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
 
   // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -129,9 +175,87 @@ const LessorBookingsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Filter and Search Controls */}
+      <div className="row g-3 align-items-center" style={{ padding: '0 15px' }}>
+  {/* Status Filter */}
+  <div className="col-md-3">
+    <div className="form-group">
+      <label htmlFor="statusFilter" className="form-label">Filter by Status</label>
+      <div className="input-group">
+        <select
+          id="statusFilter"
+          className="form-control"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as 'all' | Booking['status'])}
+        >
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  {/* Search Input */}
+  <div className="col-md-3">
+    <div className="form-group">
+      <label htmlFor="searchTerm" className="form-label">Search</label>
+      <div className="input-group">
+        <span className="input-group-text">
+          <i className="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          id="searchTerm"
+          className="form-control"
+          placeholder="User or car name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+    </div>
+  </div>
+  
+  {/* Sort Order */}
+  <div className="col-md-3">
+    <div className="form-group">
+      <label htmlFor="sortOrder" className="form-label">Sort by Date</label>
+      <div className="input-group">
+        <select
+          id="sortOrder"
+          className="form-control"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  {/* Clear Filters */}
+  <div className="col-md-3">
+    <div className="form-group">
+      <label className="form-label" style={{ visibility: 'hidden' }}>Action</label>
+      <button
+        className="btn btn-outline-secondary w-100"
+        onClick={() => {
+          setStatusFilter('all');
+          setSearchTerm('');
+          setSortOrder('newest');
+        }}
+      >
+        Clear Filters
+      </button>
+    </div>
+  </div>
+</div>
+
       <div className="card shadow-sm">
         <div className="card-body">
-          {bookings.length > 0 ? (
+          {filteredBookings.length > 0 ? (
             <>
               <div className="table-responsive">
                 <table className="table table-hover">
@@ -227,7 +351,7 @@ const LessorBookingsPage: React.FC = () => {
             </>
           ) : (
             <div className="alert alert-info">
-              No bookings found
+              No bookings found matching your criteria
             </div>
           )}
         </div>
