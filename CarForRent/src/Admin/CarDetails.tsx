@@ -13,12 +13,27 @@ interface Car {
   images: { id: number, image_path: string }[];
   status?: string;
 }
+interface Booking {
+  id: number;
+  start_date: string;
+  end_date: string;
+  status: string;
+  total_price: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
 
 const CarDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [car, setCar] = useState<Car | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+const [loadingBookings, setLoadingBookings] = useState<boolean>(true);
+const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -33,6 +48,21 @@ const CarDetailsPage: React.FC = () => {
     };
 
     fetchCar();
+  }, [id]);
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/users/cars/${id}/bookings`);
+        setBookings(response.data.data || response.data);
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        setError('Failed to load bookings');
+      } finally {
+        setLoadingBookings(false);
+      }
+    };
+  
+    fetchBookings();
   }, [id]);
   const navigate = useNavigate();
 
@@ -168,6 +198,61 @@ const CarDetailsPage: React.FC = () => {
             </div>
           </div>
         </div>
+        <div className="card shadow-sm mt-4">
+  <div className="card-header">
+    <h4 className="mb-0">Car Bookings</h4>
+  </div>
+  <div className="card-body">
+    {loadingBookings ? (
+      <div className="text-center py-4">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    ) : error ? (
+      <div className="alert alert-danger">{error}</div>
+    ) : bookings.length === 0 ? (
+      <div className="alert alert-info">No bookings found for this car</div>
+    ) : (
+      <div className="table-responsive">
+        <table className="table table-hover">
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Customer</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Total Price</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.map((booking) => (
+              <tr key={booking.id}>
+                <td>{booking.id}</td>
+                <td>
+                  <div>{booking.user.name}</div>
+                  <small className="text-muted">{booking.user.email}</small>
+                </td>
+                <td>{new Date(booking.start_date).toLocaleDateString()}</td>
+                <td>{new Date(booking.end_date).toLocaleDateString()}</td>
+                <td>JD{booking.total_price}</td>
+                <td>
+                  <span className={`badge ${
+                    booking.status === 'confirmed' ? 'bg-success' : 
+                    booking.status === 'pending' ? 'bg-warning' : 'bg-secondary'
+                  }`}>
+                    {booking.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+</div>
       </div>
     </div>
   );

@@ -54,6 +54,25 @@ class UserController extends Controller
         ], 404);
     }
 }
+public function carBookings($id)
+{
+    try {
+        $bookings = Booking::with(['user'])
+                        ->where('car_id', $id)
+                        ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $bookings
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error fetching car bookings'
+        ], 500);
+    }
+}
 
     public function bookings($id)
     {

@@ -59,6 +59,7 @@ Route::group(['prefix' => 'lessors'], function() {
 });
 Route::group(['prefix' => 'users'], function() {
     Route::get('/{id}', [UserController::class, 'show']);
+    Route::get('/cars/{id}/bookings', [UserController::class, 'carBookings']);
     Route::get('/{id}/bookings', [UserController::class, 'bookings']);
     Route::put('/{id}', [UserController::class, 'update']);
 Route::post('/{id}', [UserController::class, 'update']);

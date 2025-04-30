@@ -22,6 +22,7 @@ interface Car {
   price_per_day: number;
   images?: CarImage[];
   lessor?: Lessor;
+  location:string;
 }
 
 interface Booking {
@@ -528,6 +529,7 @@ export default function Cars() {
                       
                       <div className="d-flex mb-3">
                         <span className="cat">color: {car.color}</span>
+                        <span className="cat">location: {car.location}</span>
                         <span className="cat">{car.description}</span>
                         <p className="price ml-auto">JD{car.price_per_day} <span>/day</span></p>
                       </div>
