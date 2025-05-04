@@ -782,7 +782,7 @@ export default function CarSingle() {
                       ></div>
                       <div className="text p-3">
                         <h2 className="mb-0">
-                          <a href={`/cars/${relatedCar.id}`} className="text-dark">
+                          <a href={`/car-single/${relatedCar.id}`} className="text-dark">
                             {relatedCar.name}
                           </a>
                         </h2>

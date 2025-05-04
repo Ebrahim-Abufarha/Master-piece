@@ -38,7 +38,7 @@ const CarCard = ({ car }: CarCardProps) => {
     <div className="px-2">
       <div className="blog-entry justify-content-end">
         <div className="position-relative">
-          <a href={`/cars/${car.id}`} className="block-20" 
+          <a href={`/car-single/${car.id}`} className="block-20" 
             style={{ 
               backgroundImage: hasImages 
                 ? `url('http://localhost:8000/storage/${car.images[0].image_path}')`  
