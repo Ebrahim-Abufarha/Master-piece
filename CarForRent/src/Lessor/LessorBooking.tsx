@@ -317,13 +317,13 @@ const LessorBookingsPage: React.FC = () => {
               <nav className="mt-4">
                 <ul className="pagination justify-content-center">
                   <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button
+                    {/* <button
                       className="page-link"
                       onClick={() => paginate(currentPage - 1)}
                       disabled={currentPage === 1}
                     >
                       Previous
-                    </button>
+                    </button> */}
                   </li>
                   
                   {Array.from({ length: totalPages }, (_, i) => (
@@ -338,13 +338,13 @@ const LessorBookingsPage: React.FC = () => {
                   ))}
                   
                   <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button
+                    {/* <button
                       className="page-link"
                       onClick={() => paginate(currentPage + 1)}
                       disabled={currentPage === totalPages}
                     >
                       Next
-                    </button>
+                    </button> */}
                   </li>
                 </ul>
               </nav>

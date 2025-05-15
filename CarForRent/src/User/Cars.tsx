@@ -516,23 +516,37 @@ export default function Cars() {
                             handleFavoriteClick(car.id);
                           }}
                         >
-                          <FaHeart color={favorites.includes(car.id) ? "#01d28e" : "#ccc"} />
                         </span>
                       </h2>
                       
-                      {car.lessor && (
-                        <div className="lessor-info mb-2">
+                      {car.lessor && (<>
+                      <div className=""                        style={{ display:"flex",justifyContent:"space-between" }}
+                      >
+                        <div
+                        className="lessor-info mb-2">
                           <span className="text-muted">By: </span>    
                           <a href={`Carlessors/${car.lessor.id}`}>{car.lessor.name}</a>
+
                         </div>
+                        <div className="zzzzz">
+                                                    <FaHeart color={favorites.includes(car.id) ? "#01d28e" : "#ccc"} />
+
+                        </div>
+                        
+                        </div>
+                        </>
                       )}
                       
-                      <div className="d-flex mb-3">
+                      <div
+                       className="d-flex mb-3"
+                       style={{ justifyContent:"space-between" }}>
                         <span className="cat">color: {car.color}</span>
                         <span className="cat">location: {car.location}</span>
-                        <span className="cat">{car.description}</span>
+                        {/* <span className="cat">{car.description}</span> */}
+                      </div>                      
+                      
                         <p className="price ml-auto">JD{car.price_per_day} <span>/day</span></p>
-                      </div>
+
                       <p className="d-flex mb-0 d-block">
                         <a 
                           href="#" 
@@ -559,17 +573,10 @@ export default function Cars() {
           
           {filteredCars.length > ITEMS_PER_PAGE && (
             <div className="pagination-container">
-              <Pagination>
-                <Pagination.Prev 
-                  onClick={() => paginate(Math.max(1, currentPage - 1))} 
-                  disabled={currentPage === 1}
-                />
-                {renderPaginationItems()}
-                <Pagination.Next 
-                  onClick={() => paginate(Math.min(totalPages, currentPage + 1))} 
-                  disabled={currentPage === totalPages}
-                />
-              </Pagination>
+             <Pagination>
+  {renderPaginationItems()}
+</Pagination>
+
             </div>
           )}
         </div>

@@ -104,17 +104,17 @@ const AdminBookingsPage: React.FC = () => {
     setCurrentPage(1); // Reset to first page when filters change
   }, [bookings, statusFilter, searchTerm, sortOrder]);
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this booking?')) return;
+  // const handleDelete = async (id: number) => {
+  //   if (!window.confirm('Are you sure you want to delete this booking?')) return;
     
-    try {
-      await axios.delete(`http://localhost:8000/api/admin/bookings/${id}`);
-      setBookings(prev => prev.filter(booking => booking.id !== id));
-    } catch (error) {
-      console.error('Error deleting booking:', error);
-      alert('Failed to delete booking');
-    }
-  };
+  //   try {
+  //     await axios.delete(`http://localhost:8000/api/admin/bookings/${id}`);
+  //     setBookings(prev => prev.filter(booking => booking.id !== id));
+  //   } catch (error) {
+  //     console.error('Error deleting booking:', error);
+  //     alert('Failed to delete booking');
+  //   }
+  // };
 
   // Get current bookings
   const indexOfLastBooking = currentPage * bookingsPerPage;
@@ -251,7 +251,7 @@ const AdminBookingsPage: React.FC = () => {
                       <th>Dates</th>
                       <th>Total</th>
                       <th>Status</th>
-                      <th>Actions</th>
+                      {/* <th>Actions</th> */}
                     </tr>
                   </thead>
                   <tbody>
@@ -277,12 +277,12 @@ const AdminBookingsPage: React.FC = () => {
                           </span>
                         </td>
                         <td>
-                          <button
+                          {/* <button
                             onClick={() => handleDelete(booking.id)}
                             className="btn btn-sm btn-outline-danger"
                           >
                             Delete
-                          </button>
+                          </button> */}
                         </td>
                       </tr>
                     ))}
