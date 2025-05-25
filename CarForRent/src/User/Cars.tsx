@@ -516,12 +516,14 @@ export default function Cars() {
                             handleFavoriteClick(car.id);
                           }}
                         >
+                                                    {/* <FaHeart color={favorites.includes(car.id) ? "#01d28e" : "#ccc"} /> */}
+
+
                         </span>
                       </h2>
                       
                       {car.lessor && (<>
-                      <div className=""                        style={{ display:"flex",justifyContent:"space-between" }}
-                      >
+                      <div className="" style={{ display:"flex",justifyContent:"space-between" }}>
                         <div
                         className="lessor-info mb-2">
                           <span className="text-muted">By: </span>    
@@ -529,8 +531,18 @@ export default function Cars() {
 
                         </div>
                         <div className="zzzzz">
+  <span 
+                          style={{ paddingLeft: "150px", cursor: "pointer" }} 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleFavoriteClick(car.id);
+                          }}
+                        >
                                                     <FaHeart color={favorites.includes(car.id) ? "#01d28e" : "#ccc"} />
 
+
+                        </span>
                         </div>
                         
                         </div>
