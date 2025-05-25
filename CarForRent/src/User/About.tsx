@@ -12,7 +12,6 @@ export default function About(){
         </div>
       </div>
     </section>
-{/* test */}
     <section className="ftco-section ftco-about">
 			<div className="container">
 				<div className="row no-gutters">
